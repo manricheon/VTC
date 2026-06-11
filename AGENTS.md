@@ -11,6 +11,15 @@ The first subproject is `projects/gaze-ov-bridge`.
 - Do not assume CUDA during initial development.
 - Prefer CPU/MPS-safe pure Python tests first.
 
+## Engineering Workflow
+
+- Use simple, readable code.
+- Prefer functions over classes unless state is necessary.
+- Avoid unnecessary abstraction.
+- Verify nontrivial changes with tests, smoke scripts, profiles, or documented blocker evidence.
+- Keep public code commits separate from local guidance commits.
+- Use `$karpathy-engineering` for substantial work, refactors, blocker resolution, model integration, and worktree handoff.
+
 ## Repository Policy
 
 - `external/` stores third-party source repos.

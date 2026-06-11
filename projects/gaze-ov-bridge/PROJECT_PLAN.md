@@ -2,6 +2,15 @@
 
 `gaze-ov-bridge` rebuilds the previous AutoGaze / OneVision-Encoder / LLaVA-OV2 experiments in staged, auditable increments.
 
+## Engineering Workflow
+
+- Keep implementation simple and contract-first.
+- Prefer functions over classes unless state is necessary.
+- Avoid unnecessary abstraction and silent fallback.
+- Use `$karpathy-engineering` before substantial development, refactor, blocker resolution, model integration, and worktree handoff.
+- Verify changes with focused tests, synthetic smoke, profile output, or documented blocker evidence.
+- Keep local guidance commits separate from public source/test/script/doc commits.
+
 ## Project A First: AutoGaze -> LLaVA-OV2 Codec-Compatible Path
 
 1. Define the artifact schema for AutoGaze selections and frame metadata.

@@ -17,6 +17,15 @@ Project B is second: AutoGaze -> OV-Encoder direct path for feature-level analys
 - Use Linux + uv as the official development target.
 - Allow MacBook/MPS only for lightweight probes when possible.
 
+## Engineering Style
+
+- Keep code simple, explicit, and easy to hand off.
+- Prefer small functions over classes unless real state needs a class.
+- Avoid unnecessary abstraction and silent fallback.
+- Require a reproducible check for nontrivial work: pytest, smoke, profile, or documented blocker.
+- Keep public code/docs separate from local guidance commits.
+- Use `$karpathy-engineering` for substantial work, refactors, blocker resolution, model integration, and worktree handoff.
+
 ## Environments
 
 Use separate environments:

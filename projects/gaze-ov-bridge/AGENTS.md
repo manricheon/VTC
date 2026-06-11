@@ -1,5 +1,15 @@
 # gaze-ov-bridge Agent Guidance
 
+## Always-On Engineering Rules
+
+- Use simple, readable code.
+- Prefer functions over classes unless state is necessary.
+- Avoid unnecessary abstraction.
+- Keep artifact contracts explicit and inspectable.
+- Verify nontrivial changes with tests, smoke scripts, profiles, or documented blocker evidence.
+- Keep public code commits separate from local guidance commits.
+- Use `$karpathy-engineering` for substantial work, refactors, blocker resolution, model integration, and worktree handoff.
+
 ## Project A, Priority 1: AutoGaze -> LLaVA-OV2 Codec-Compatible Backend
 
 - Goal: obtain answer-level score and later lmms-eval results.
