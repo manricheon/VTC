@@ -1,78 +1,38 @@
 # Blocker Resolution Status
 
-Status date: `2026-06-11T07:28:02Z`
+Status date: `2026-06-11T13:12:23Z`
 
-Model weights were downloaded under `weights/` because the explicit weight-download environment flags were set. No model inference was run, no heavy model dependencies were installed, and no push was performed.
-
-Status values used below:
-
-- `resolved`
-- `partially_resolved`
-- `still_blocked`
-- `needs_hf_token`
-- `needs_gated_access`
-- `needs_ffmpeg`
-- `needs_cuda`
-- `needs_model_env_probe`
-- `deferred`
+No push was performed. No model inference was run. `external/`, `weights/`, `artifacts/`, and `projects/gaze-ov-bridge/out/` remain uncommitted.
 
 ## Status Table
 
-| Blocker | Status | Current evidence | Next action |
+| Blocker | Status | Evidence | Next action |
 | --- | --- | --- | --- |
-| Bridge-core tests and compile gate | `resolved` | `uv run pytest ../../projects/gaze-ov-bridge/tests` reports `35 passed`; `compileall` passes for `projects/gaze-ov-bridge/src`. | Keep as the required gate before source or model-runtime changes. |
-| Project A synthetic smoke | `resolved` | `docs/public/synthetic_smoke_status.md` records passing `project_a_codec` smoke with `5` valid AutoGaze tokens, `2` selected 112 blocks, `8` raw patch tokens, and no-hard-union confirmation. | Project A artifact-contract work can start without real model generation. |
-| Project B synthetic smoke | `resolved` | `docs/public/synthetic_smoke_status.md` records passing `project_b_ov_direct` smoke with `5` direct tokens and no-native-union confirmation. | Project B artifact-contract work can start without real encoder forward. |
-| Profiling schema and smoke profiles | `resolved` | Project A and Project B smokes write `stats.json` and `profile.json`; `profile_summary.py` parses generated profiles. | Reuse the same schema for model-specific probes and later real integrations. |
-| External GitHub source repos | `resolved` | `external/AutoGaze`, `external/LLaVA-OneVision-2`, and `external/lmms-eval` are present; commits are recorded in `docs/public/external_snapshot.md`. | Keep `external/` uncommitted and refresh snapshots only by explicit task. |
-| LLaVA-OV2 HF custom code | `resolved` | Code/config/text snapshot exists at `external/LLaVA-OneVision-2-8B-Instruct-code`; revision is recorded in `docs/public/external_snapshot.md`; no model payloads under `external/`. | Use for processor/backend source inspection and no-weight import probes. |
-| OneVision-Encoder HF custom code | `resolved` | Code/config/text snapshot exists at `external/OneVision-Encoder`; revision is recorded in `docs/public/external_snapshot.md`; no model payloads under `external/`. | Use for Project B source inspection and no-weight import probes. |
-| AutoGaze HF repo verification | `resolved` | `nvidia/AutoGaze` is public, ungated in metadata, `model_type=autogaze`, and has `config.json`, `preprocessor_config.json`, and `model.safetensors`. | Use `VTC_AUTOGAZE_REPO=nvidia/AutoGaze` for the first approved AutoGaze weight-download attempt. |
-| `bfshi/AutoGaze` ambiguity | `partially_resolved` | Source quick-start references it, but public metadata/listing returned unavailable without a token. Public README points to `nvidia/AutoGaze`. | Treat as stale/private/renamed unless the user provides access or new evidence. |
-| HF token/authentication | `partially_resolved` | `HF_TOKEN` is not set, but the three current public-visible weight downloads completed in public-only mode. A token may still be useful for rate limits or future private/gated repos. | Authenticate through `HF_TOKEN` in the shell or `uv run hf auth login` under `envs/hf-tools` before private/gated downloads; never commit tokens. |
-| Potential gated/private repo access | `deferred` | No active gated failure was hit in this pass. Private/gated access remains possible for future payload downloads outside the current public-visible repos. | If a download reports gated/private access, accept/request access for that exact repo, then rerun with safe auth. |
-| Weight downloads | `resolved` | `weights/checkpoints/AutoGaze`, `weights/checkpoints/onevision-encoder-large`, and `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct` contain payload files and `snapshot_manifest.json` files. | Do not commit `weights/`; proceed to isolated env sync/probes before model inference. |
-| Linux ffmpeg/system dependency | `needs_ffmpeg` | Current local PATH has no `ffmpeg`; Linux target status remains unverified; `ALLOW_SYSTEM_INSTALL` is not set. Codec backend tests require `ffmpeg` on PATH. | Install/verify `ffmpeg` on Linux and run `bash scripts/check_system_deps.sh`. |
-| Model-specific env import probes | `needs_model_env_probe` | Current compatibility probes were `uv run --no-sync`; `VTC_ALLOW_HEAVY_ENV_SYNC` is not set, so model runtime imports remain unavailable. | Sync/probe each env separately with `VTC_ALLOW_HEAVY_ENV_SYNC=1`, starting with `envs/ov-encoder` and `envs/llava-ov2`; keep `lmms-eval` last. |
-| AutoGaze runtime env | `needs_model_env_probe` | AutoGaze source and weights are present, but runtime deps such as `torch`, `transformers~=4.51`, `flash_attn`, and video libs are not synced/probed. | Sync/probe `envs/autogaze` on Linux; classify FlashAttention policy before real generation. |
-| LLaVA-OV2 processor/backend env | `needs_model_env_probe` | HF custom code and weights are present, but `torch`, `transformers`, video deps, codec deps, and `ffmpeg` are absent/unverified. | Verify `ffmpeg`, sync/probe `envs/llava-ov2`, then test processor/backend imports without generation. |
-| OV-Encoder runtime env | `needs_model_env_probe` | HF custom code and weights are present, but `torch`, `transformers`, and attention fallback behavior are unverified. | Sync/probe `envs/ov-encoder` with the intended Transformers version and explicit SDPA/eager checks. |
-| `flash_attn` requirements | `needs_cuda` | bridge-core does not require `flash_attn`. AutoGaze declares it; LLaVA-OV2 and OneVision source show fallback indicators, but runtime fallback is unverified; `lmms-eval` adapter defaults to `flash_attention_2`. | Confirm `sdpa`/`eager` behavior after isolated env sync. Classify mandatory FlashAttention paths as Linux/CUDA-only. |
-| CUDA availability | `needs_cuda` | No CUDA runtime verification has been performed on the official Linux target. | Verify only on the Linux CUDA machine after dependencies and weights are available. |
-| MPS optional probes | `deferred` | Optional MPS probe is partial and torch is absent; MPS is not an official target. | Run only if a local Mac/MPS diagnostic is useful; do not treat as Linux support. |
-| lmms-eval benchmark | `deferred` | Source adapter exists and has timing/token hooks, but benchmark deps, model runtimes, weights, and `ffmpeg` are not ready. | Keep isolated in `envs/lmms-eval`; start after Project A model path works. |
-| Pre-worktree automation | `resolved` | `scripts/vtc_doctor.sh`, `scripts/setup_bridge_core.sh`, `scripts/setup_model_envs_best_effort.sh`, `scripts/setup_hf_assets.sh`, and `scripts/pre_worktree_gate.sh` exist. | Use these scripts as the pre-worktree reproducibility gate. |
+| Bridge-core tests and compile gate | `resolved` | `pytest` reports 37 passed; `compileall` passes. | Keep as required gate. |
+| Project A synthetic smoke/profile | `resolved` | Project A smoke passes with 2 selected 112 blocks, 8 raw patch tokens, and profile output. | Start Project A artifact-contract worktree. |
+| Project B synthetic smoke/profile | `resolved` | Project B smoke passes with 5 direct tokens and profile output. | Start Project B artifact-contract worktree. |
+| Profiling schema and summary | `resolved` | `profile_summary.py` parses both smoke profiles. | Reuse for model probes. |
+| External source repos | `resolved` | `audit_external_sources.sh` finds all expected external paths. | Keep `external/` ignored. |
+| AutoGaze HF repo verification | `resolved` | `nvidia/AutoGaze` is the selected AutoGaze repo; payload exists locally. | Use this repo for future refreshes. |
+| HF token/access | `partially_resolved` | `HF_TOKEN` is not set; current payloads are present in public-only mode. | Authenticate only if future gated/private access is needed. |
+| Weight directories | `resolved` | `check_hf_assets.sh` reports payloads for AutoGaze, OneVision-Encoder, and LLaVA-OV2. | Do not commit `weights/`. |
+| Linux ffmpeg/system dependency | `needs_ffmpeg` | `check_system_deps.sh` reports `ffmpeg` missing on current host; Linux target unverified. | Install/verify on Linux before codec/backend runtime work. |
+| Model-specific env import probes | `needs_model_env_probe` | no heavy sync; no-sync probes are partial. | Run `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh`. |
+| AutoGaze runtime env | `needs_model_env_probe` | source and weights present; runtime deps not synced. | Sync/probe isolated `envs/autogaze`. |
+| LLaVA-OV2 processor/backend env | `needs_model_env_probe` | source and weights present; runtime deps and `ffmpeg` absent/unverified. | Sync/probe isolated `envs/llava-ov2`. |
+| OV-Encoder runtime env | `needs_model_env_probe` | source and weights present; runtime deps/fallback unverified. | Sync/probe isolated `envs/ov-encoder`. |
+| `flash_attn` requirements | `needs_cuda` | no-sync probes show `flash_attn` absent; source suggests fallbacks but runtime is unverified. | Verify `sdpa`/`eager` or classify as Linux/CUDA-only. |
+| CUDA availability | `needs_cuda` | no CUDA target checked in this pass. | Verify on official Linux CUDA machine. |
+| MPS optional probe | `deferred` | no-sync MPS probe ran, but torch is absent; MPS is not official. | Run only as best-effort local diagnostic. |
+| lmms-eval benchmark | `deferred` | source adapter exists; benchmark env not synced and Project A runtime path not verified. | Defer until LLaVA-OV2 runtime path works. |
+| Pre-worktree automation | `resolved` | doctor, system deps, HF asset check, external audit, bridge setup, model-env wrapper, HF wrapper, compat probes, and gate scripts exist. | Use scripts before worktree handoff. |
 
-## Worktree Readiness Decision
+## Worktree Readiness
 
-Project A bridge artifact-contract worktree:
+Project A worktree: ready for artifact-contract and integration-boundary work; blocked for real generation until runtime blockers are resolved.
 
-- Status: ready.
-- Scope allowed: bridge-core artifact contract, profile/stat validation, LLaVA-OV2 processor boundary planning without generation.
-- Scope blocked: real LLaVA-OV2 generation, codec backend execution, weight-backed tests.
+Project B worktree: ready for artifact-contract and integration-boundary work; blocked for real encoder forward until runtime blockers are resolved.
 
-Project B bridge artifact-contract worktree:
+Worktree C / lmms-eval: not ready for benchmark work; start only after Project A model-runtime path works.
 
-- Status: ready.
-- Scope allowed: bridge-core artifact contract, OV-direct patch/position contract, pack metadata, profile/stat validation.
-- Scope blocked: real OV-Encoder forward, weight-backed tests.
-
-Model-runtime worktrees:
-
-- Status: blocked until the matching env is synced/probed and required weights/system deps are available.
-
-Pre-worktree gate:
-
-- Status: ready to run.
-- Gate may pass for artifact-contract work while model-runtime blockers remain explicitly documented.
-
-## Recommended Next Order
-
-1. Start Project A artifact-contract worktree.
-2. Start Project B artifact-contract worktree.
-3. Verify/install Linux `ffmpeg`.
-4. Sync/probe `envs/ov-encoder` without inference.
-5. Sync/probe `envs/llava-ov2` without generation.
-6. Sync/probe `envs/autogaze` on Linux.
-7. Keep downloaded weights under ignored `weights/`; refresh only after explicit approval and disk/auth preflight.
-8. Defer `envs/lmms-eval` until Project A generation path is ready.
+Final gate: `READY_FOR_WORKTREE=1`.

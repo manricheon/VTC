@@ -1,70 +1,57 @@
 # Model Environment Status
 
-Status date: `2026-06-11T07:28:02Z`
+Status date: `2026-06-11T13:12:23Z`
 
-No heavy model environment sync was run for this status update because `VTC_ALLOW_HEAVY_ENV_SYNC` is not set to `1`. Model weights are now present under `weights/checkpoints/`, but no model inference was run.
+No heavy model environment sync was run in this pass. The no-sync compatibility probes were run with:
 
-## Policy
+```bash
+RUN_UV_PROBES=1 RUN_OPTIONAL_MPS=1 bash scripts/run_compat_probes.sh
+```
 
-Each model family remains isolated:
+This does not install dependencies and does not run model inference.
 
-- `envs/autogaze`
-- `envs/ov-encoder`
-- `envs/llava-ov2`
-- `envs/lmms-eval`
-- `envs/mps-probe`
+## Summary
 
-Do not merge these dependencies into `envs/bridge-core`.
-
-## Current Summary
-
-| Env | uv sync status | Import probe status | Current blocker | Next command |
+| Env | uv sync status | Probe status | Current blocker | Next command |
 | --- | --- | --- | --- | --- |
-| `envs/autogaze` | skipped by policy | partial from previous no-sync probe | heavy deps and FlashAttention policy unresolved | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
-| `envs/ov-encoder` | skipped by policy | partial from previous no-sync probe | `torch`/`transformers` absent, fallback unverified | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
-| `envs/llava-ov2` | skipped by policy | partial from previous no-sync probe | runtime deps and `ffmpeg` absent/unverified | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
-| `envs/lmms-eval` | skipped by policy | partial from previous no-sync probe | benchmark deps and model runtimes absent | Defer until LLaVA-OV2 runtime path works. |
-| `envs/mps-probe` | skipped by policy | optional partial probe | optional Mac/MPS diagnostics only; torch absent | `VTC_ALLOW_HEAVY_ENV_SYNC=1 VTC_ALLOW_MPS_PROBE=1 bash scripts/setup_model_envs_best_effort.sh` |
+| `envs/bridge-core` | synced | pass | none for pure-Python bridge work | `bash scripts/setup_bridge_core.sh` |
+| `envs/autogaze` | not synced | partial | `torch`, `transformers`, `flash_attn`, video deps absent; fallback unverified | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
+| `envs/ov-encoder` | not synced | partial | `torch`/`transformers` absent; SDPA/eager runtime fallback unverified | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
+| `envs/llava-ov2` | not synced | partial | `torch`, `transformers`, codec/video deps, and `ffmpeg` absent/unverified | `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh` |
+| `envs/lmms-eval` | not synced | partial | benchmark deps absent; adapter import blocked by missing deps such as `loguru` | defer until LLaVA-OV2 runtime path works |
+| `envs/mps-probe` | not synced | optional partial | `torch` absent, so MPS availability cannot be checked | optional only; not official support |
 
-## Best-Effort Wrapper
+## Weight Availability
 
-Use:
+All three expected checkpoint directories contain recognized payload files:
 
-```bash
-bash scripts/setup_model_envs_best_effort.sh
-```
+| Target | Status | Local size |
+| --- | --- | --- |
+| AutoGaze | payload present | 13M |
+| OneVision-Encoder | payload present | 602M |
+| LLaVA-OV2 | payload present | 16G |
 
-Default behavior:
+Weights are not committed and remain under `weights/`.
 
-- Does not run `uv sync`.
-- Does not install heavy dependencies.
-- Does not download model weights.
-- Writes `artifacts/compat/model_envs_best_effort.json` with skipped-by-policy records.
+## Profiling Capability
 
-Heavy sync behavior:
+No-sync probes confirm:
 
-```bash
-VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh
-```
-
-This attempts `uv sync` separately inside each model env and then runs the matching probe script. It continues best-effort if one env fails.
+- process RSS: available
+- `tracemalloc`: available
+- torch CUDA memory: unavailable until torch is installed in the target env
+- torch MPS memory: unavailable until torch is installed in the optional MPS env
 
 ## Readiness Decision
 
 Ready:
 
-- `envs/bridge-core` is ready for Project A/B pure-Python artifact work.
+- `envs/bridge-core` is ready for Project A/B artifact-contract work.
 
 Not ready:
 
 - `envs/autogaze` is not ready for real AutoGaze generation.
 - `envs/ov-encoder` is not ready for real OV-Encoder forward.
 - `envs/llava-ov2` is not ready for real LLaVA-OV2 generation.
-- `envs/lmms-eval` is not ready for full benchmark runs.
-- `envs/mps-probe` is optional and not an official compatibility gate.
-
-Weight availability:
-
-- AutoGaze: downloaded.
-- OneVision-Encoder: downloaded.
-- LLaVA-OV2: downloaded.
+- `envs/lmms-eval` is not ready for full benchmarks.
+- `envs/mps-probe` is optional and not an official gate.

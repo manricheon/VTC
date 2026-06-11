@@ -1,6 +1,6 @@
 # Hugging Face Weights Snapshot
 
-Snapshot date: `2026-06-11T07:41:51Z`
+Snapshot date: `2026-06-11T13:16:27Z`
 
 No model inference was run by the weight setup helper. Downloaded files, if any, remain under `weights/` and must not be committed.
 
@@ -23,19 +23,19 @@ Disk:
 
 Download flags:
 
-- `VTC_ALLOW_WEIGHT_DOWNLOAD`: 1
-- `VTC_DOWNLOAD_AUTOGAZE`: 1
-- `VTC_DOWNLOAD_OV_ENCODER`: 1
-- `VTC_DOWNLOAD_LLAVA_OV2`: 1
-- `VTC_ALLOW_LLAVA_OV2_DOWNLOAD`: 1
+- `VTC_ALLOW_WEIGHT_DOWNLOAD`: not set
+- `VTC_DOWNLOAD_AUTOGAZE`: not set
+- `VTC_DOWNLOAD_OV_ENCODER`: not set
+- `VTC_DOWNLOAD_LLAVA_OV2`: not set
+- `VTC_ALLOW_LLAVA_OV2_DOWNLOAD`: not set
 
 ## Snapshot Table
 
 | Target name | Repo id | Local path | Status | Snapshot revision | File count | Payload file count | Approx total size | Date | Token used | Next action |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- | --- | --- |
-| AutoGaze | `nvidia/AutoGaze` | `weights/checkpoints/AutoGaze` | `downloaded` | `default` | 15 | 1 | 13M | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
-| OneVision-Encoder | `lmms-lab-encoder/onevision-encoder-large` | `weights/checkpoints/onevision-encoder-large` | `downloaded` | `default` | 19 | 1 | 602M | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
-| LLaVA-OV2 | `lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct` | `downloaded` | `default` | 51 | 4 | 16G | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
+| AutoGaze | `nvidia/AutoGaze` | `weights/checkpoints/AutoGaze` | `downloaded` | `default` | 15 | 1 | 13M | `2026-06-11T13:16:27Z` | no | No action; recognized payload files are already present. |
+| OneVision-Encoder | `lmms-lab-encoder/onevision-encoder-large` | `weights/checkpoints/onevision-encoder-large` | `downloaded` | `default` | 19 | 1 | 602M | `2026-06-11T13:16:27Z` | no | No action; recognized payload files are already present. |
+| LLaVA-OV2 | `lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct` | `downloaded` | `default` | 51 | 4 | 16G | `2026-06-11T13:16:27Z` | no | No action; recognized payload files are already present. |
 
 ## Rerun Commands
 

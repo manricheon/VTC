@@ -99,6 +99,21 @@ classify_download_result() {
   fi
 }
 
+mark_existing_payloads() {
+  if [[ "$(payload_count "${AUTOGAZE_DIR}")" != "0" ]]; then
+    status_autogaze="downloaded"
+    next_autogaze="No action; recognized payload files are already present."
+  fi
+  if [[ "$(payload_count "${OV_DIR}")" != "0" ]]; then
+    status_ov="downloaded"
+    next_ov="No action; recognized payload files are already present."
+  fi
+  if [[ "$(payload_count "${LLAVA_DIR}")" != "0" ]]; then
+    status_llava="downloaded"
+    next_llava="No action; recognized payload files are already present."
+  fi
+}
+
 run_hf_tool() {
   (
     cd "${HF_TOOLS_DIR}"
@@ -221,9 +236,10 @@ Weight-backed model probes can proceed only for rows marked \`downloaded\`, and 
 - AutoGaze requires payload files under \`weights/checkpoints/AutoGaze\`.
 - OneVision-Encoder requires payload files under \`weights/checkpoints/onevision-encoder-large\`.
 - LLaVA-OV2 requires payload files under \`weights/checkpoints/LLaVA-OneVision-2-8B-Instruct\`.
-
 EOF
 }
+
+mark_existing_payloads
 
 if [[ "${VTC_ALLOW_WEIGHT_DOWNLOAD:-0}" != "1" ]]; then
   echo "Weight downloads are disabled because VTC_ALLOW_WEIGHT_DOWNLOAD is not 1."

@@ -7,6 +7,9 @@ VTC_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 RUN_UV_PROBES="${RUN_UV_PROBES:-0}"
 RUN_OPTIONAL_MPS="${RUN_OPTIONAL_MPS:-0}"
 
+export UV_CACHE_DIR="${UV_CACHE_DIR:-${TMPDIR:-/tmp}/vtc-uv-cache}"
+mkdir -p "${UV_CACHE_DIR}"
+
 if [[ -f "${VTC_ROOT}/scripts/env_weights.sh" ]]; then
   # Keep HF cache/checkpoint paths under VTC/weights for every probe.
   # shellcheck disable=SC1091

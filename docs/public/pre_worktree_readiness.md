@@ -1,72 +1,100 @@
 # Pre-Worktree Readiness
 
-Status date: `2026-06-11T07:28:02Z`
+Status date: `2026-06-11T13:12:23Z`
 
-No model inference was run. Model weights were downloaded under `weights/checkpoints/` because the explicit download flags were set. Heavy model env sync was not run because `VTC_ALLOW_HEAVY_ENV_SYNC` is not set.
+No model inference was run. No new weights were downloaded in this pass. No external repos were cloned in this pass.
 
-## Final Readiness Summary
+## Final Decision
 
-`READY_FOR_WORKTREE=1` for Project A and Project B artifact-contract worktrees.
+`READY_FOR_WORKTREE=yes`
 
-This readiness does not mean model-runtime readiness. It means the pure-Python bridge, synthetic smokes, profiling outputs, public blocker docs, and source snapshots are in place for parallel pre-runtime work.
+`bash scripts/pre_worktree_gate.sh` reports:
 
-## Resolved For Worktree Start
+```text
+READY_FOR_WORKTREE=1
+```
 
-- bridge-core tests pass.
-- Project A synthetic codec smoke passes and emits profile/stat artifacts.
-- Project B synthetic OV-direct smoke passes and emits profile/stat artifacts.
-- External source snapshots are present under `external/`.
-- AutoGaze repo candidate is verified as `nvidia/AutoGaze`.
-- AutoGaze, OneVision-Encoder, and LLaVA-OV2 weights are present under `weights/checkpoints/`.
-- HF cache/download policy is documented and points under `weights/`.
-- Setup/gate automation exists for doctor, system deps, bridge-core, HF assets, model envs, and pre-worktree readiness.
+This means Project A and Project B artifact-contract worktrees may start. It does not mean model-runtime readiness.
+
+## Project Readiness
+
+| Area | Readiness | Evidence | Remaining blocker |
+| --- | --- | --- | --- |
+| Project A: AutoGaze -> LLaVA-OV2 codec-compatible | ready for artifact-contract work | tests pass; Project A smoke/profile pass; `src_positions.npy` produced | real codec/backend runtime needs `ffmpeg`, env sync, import probe, attention backend verification |
+| Project B: AutoGaze -> OV-Encoder direct | ready for artifact-contract work | tests pass; Project B smoke/profile pass; `patch_positions.npy`, `patches.npy`, and `pack_plan.json` produced | real OV-Encoder forward needs env sync/import probe and attention backend verification |
+| lmms-eval | not ready for benchmark work | source and adapter exist; no full benchmark run | wait for Project A runtime path, env sync, `ffmpeg`, and attention backend verification |
+
+## Current Status
+
+External source status:
+
+- `external/AutoGaze`: present.
+- `external/LLaVA-OneVision-2`: present.
+- `external/lmms-eval`: present.
+- `external/LLaVA-OneVision-2-8B-Instruct-code`: present.
+- `external/OneVision-Encoder`: present.
+
+Weights status:
+
+- AutoGaze: payload present, 13M.
+- OneVision-Encoder: payload present, 602M.
+- LLaVA-OV2: payload present, 16G.
+
+System dependency status:
+
+- `ffmpeg`: missing on current Mac probe host; Linux target unverified.
+- `uv`, `git`, `curl`, `bash`: available on current host.
+
+Model env status:
+
+- `bridge-core`: ready.
+- model envs: no heavy sync; no-sync probes are partial only.
+
+Attention fallback status:
+
+- source suggests SDPA/eager fallback paths for OV-Encoder and LLaVA-OV2.
+- runtime fallback is unverified.
+- lmms-eval adapter defaults toward `flash_attention_2`.
+- CUDA/flash-attn readiness is unverified.
+
+Profiling status:
+
+- profile schema/utilities exist.
+- Project A and Project B smoke profiles exist.
+- `profile_summary.py` parses both smoke profiles.
+- process RSS and tracemalloc are available.
+- CUDA/MPS memory metrics require torch in the matching env.
 
 ## Remaining Blockers
 
-- `ffmpeg` is missing on the current host and unverified on Linux.
-- Model-specific envs are not synced with heavy dependencies.
-- Attention fallback is source-audited but not runtime-probed.
-- CUDA is unverified.
-- MPS is optional and not an official target.
-- `lmms-eval` remains deferred until LLaVA-OV2 runtime works.
+- Install/verify `ffmpeg` on Linux before codec/backend runtime tests.
+- Sync/probe model envs separately before import/runtime claims.
+- Verify exact attention backend (`flash_attention_2`, `sdpa`, or `eager`) per model path.
+- Run CUDA checks only on the Linux CUDA target.
+- Treat MPS as best-effort only.
 
-## Manual Actions
+## Exact Manual Actions
 
-Install/verify `ffmpeg` on Linux:
+Linux system dependency:
 
 ```bash
 bash scripts/check_system_deps.sh
 ```
 
-Re-run or refresh weights only when explicitly allowed:
-
-```bash
-source scripts/env_weights.sh
-VTC_ALLOW_WEIGHT_DOWNLOAD=1 \
-VTC_DOWNLOAD_AUTOGAZE=1 \
-VTC_DOWNLOAD_OV_ENCODER=1 \
-VTC_DOWNLOAD_LLAVA_OV2=1 \
-VTC_ALLOW_LLAVA_OV2_DOWNLOAD=1 \
-bash scripts/setup_hf_assets.sh
-```
-
-Sync/probe model envs only when explicitly allowed:
+Model env probes:
 
 ```bash
 VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh
 ```
 
-Run the gate:
+No-sync probe refresh:
+
+```bash
+RUN_UV_PROBES=1 RUN_OPTIONAL_MPS=1 bash scripts/run_compat_probes.sh
+```
+
+Final gate:
 
 ```bash
 bash scripts/pre_worktree_gate.sh
 ```
-
-## Worktree Start Order
-
-1. Project A artifact-contract integration.
-2. Project B artifact-contract integration.
-3. `envs/ov-encoder` import/fallback probe.
-4. `envs/llava-ov2` import/codec dependency probe.
-5. `envs/autogaze` generation environment setup.
-6. `envs/lmms-eval` benchmark/profiling integration.
