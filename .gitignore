@@ -1,0 +1,48 @@
+# Python cache files
+__pycache__/
+.pycache/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pytype/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build outputs
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Third-party sources, weights, and generated artifacts
+external/
+weights/
+artifacts/
+
+# Project outputs
+projects/*/out/
+
+# Model artifacts and numeric dumps
+*.pt
+*.pth
+*.safetensors
+*.npy
+*.npz
+
+# Benchmark and profiling outputs
+benchmark-results/
+benchmarks/out/
+benchmarks/results/
+profile.json
+profile.jsonl
+stats.json
+*.prof
+*.trace
