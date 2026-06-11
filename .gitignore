@@ -1,6 +1,7 @@
 # Python cache files
 __pycache__/
 .pycache/
+.cache/
 *.py[cod]
 *$py.class
 .pytest_cache/
@@ -33,16 +34,20 @@ projects/*/out/
 # Model artifacts and numeric dumps
 *.pt
 *.pth
+*.bin
+*.gguf
+*.onnx
 *.safetensors
 *.npy
 *.npz
+*.jsonl
+.env
 
 # Benchmark and profiling outputs
 benchmark-results/
 benchmarks/out/
 benchmarks/results/
 profile.json
-profile.jsonl
 stats.json
 *.prof
 *.trace
