@@ -40,6 +40,14 @@ def _backend(record: dict[str, Any]) -> str:
     return "unknown"
 
 
+def _policy(record: dict[str, Any]) -> str:
+    for path in (("policy_name",), ("project", "policy_name")):
+        value = _nested(record, path)
+        if value:
+            return str(value)
+    return "-"
+
+
 def _mean(values: list[float]) -> float | None:
     if not values:
         return None
@@ -77,6 +85,7 @@ def summarize_profiles(paths: list[Path]) -> dict[str, dict[str, Any]]:
     groups: dict[str, dict[str, Any]] = defaultdict(
         lambda: {
             "count": 0,
+            "policy": "-",
             "total_time": [],
             "model_time": [],
             "visual_tokens": [],
@@ -90,6 +99,8 @@ def summarize_profiles(paths: list[Path]) -> dict[str, dict[str, Any]]:
             backend = _backend(record)
             group = groups[backend]
             group["count"] += 1
+            if group["policy"] == "-":
+                group["policy"] = _policy(record)
             fields = {
                 "total_time": (
                     ("total_time",),
@@ -125,6 +136,7 @@ def summarize_profiles(paths: list[Path]) -> dict[str, dict[str, Any]]:
     for backend, group in sorted(groups.items()):
         summary[backend] = {
             "count": group["count"],
+            "policy": group["policy"],
             "mean_total_time": _mean(group["total_time"]),
             "mean_model_time": _mean(group["model_time"]),
             "mean_visual_tokens": _mean(group["visual_tokens"]),
@@ -141,6 +153,7 @@ def print_summary(summary: dict[str, dict[str, Any]]) -> None:
 
     headers = (
         "backend",
+        "policy",
         "count",
         "mean_total_time",
         "mean_model_time",
@@ -153,6 +166,7 @@ def print_summary(summary: dict[str, dict[str, Any]]) -> None:
         rows.append(
             (
                 backend,
+                str(values["policy"]),
                 str(values["count"]),
                 _format(values["mean_total_time"]),
                 _format(values["mean_model_time"]),
