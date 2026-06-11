@@ -1,6 +1,6 @@
 # Blocker Resolution Status
 
-Status date: `2026-06-11T06:10:32Z`
+Status date: `2026-06-11T06:15:22Z`
 
 No model weights were downloaded, no model inference was run, no heavy Python dependencies were installed, and no push was performed.
 
@@ -13,8 +13,8 @@ No model weights were downloaded, no model inference was run, no heavy Python de
 | OneVision-Encoder custom code | resolved for source inspection | Code/config/text snapshot exists at `external/OneVision-Encoder`, revision `9908b86a6c651379df4a0b0a7ecfccc6afcd544e`; no payload weights found. | Clone standalone GitHub source later only if the HF custom-code snapshot is insufficient. |
 | AutoGaze HF repo verification | resolved | `nvidia/AutoGaze` is public, ungated, `model_type=autogaze`, and has `config.json`, `preprocessor_config.json`, and `model.safetensors`. | Use `VTC_AUTOGAZE_REPO=nvidia/AutoGaze` in the weight-download task. |
 | `bfshi/AutoGaze` ambiguity | partially resolved | Source quick-start references it, but public HF metadata/listing returned model not found / 401 with no token. | Treat as stale/private/renamed unless user provides access or new evidence. |
-| HF token/access | still blocked for private/gated repos | `HF_TOKEN` is not set; HF CLI login under `HF_HOME` is unauthenticated. Public metadata/code snapshots worked. | User must authenticate before any private/gated repo download. |
-| Weight downloads | intentionally deferred | No `.safetensors`, `.bin`, `.pt`, `.pth`, `.gguf`, or `.onnx` files found under `weights/` or `external/`. | Run explicit weight-download task with `VTC_ALLOW_WEIGHT_DOWNLOAD=1`. |
+| HF token/access | still blocked for private/gated repos | `HF_TOKEN` is not set; HF CLI login under `HF_HOME` is unauthenticated. Public metadata/code snapshots worked. No gated blocker was hit in the weight pass because downloads were skipped by policy flags before payload fetch. | User must authenticate before any private/gated repo download. Public repos may still download without auth, subject to rate limits. |
+| Weight downloads | still blocked / needs manual decision | `VTC_ALLOW_WEIGHT_DOWNLOAD` was not set, so no weights were downloaded. Target checkpoint directories exist but are empty: AutoGaze `0B`, OneVision-Encoder `0B`, LLaVA-OV2 `0B`. | Set explicit allow and target flags, then rerun. Commands are recorded in `docs/public/weights_snapshot.md`. |
 | Linux ffmpeg/system dependency | still blocked / needs ffmpeg install | Current host is Darwin and has no `ffmpeg` on `PATH`; `/etc/os-release` is unavailable; Linux target not yet verified. `ALLOW_SYSTEM_INSTALL` was not set, so no system install was attempted. | Install/verify `ffmpeg` on Linux before codec/backend tests. Use `bash scripts/check_system_deps.sh` to report status, or `REQUIRED_SYSTEM_DEPS=1 bash scripts/check_system_deps.sh` for a failing gate. |
 | Model-env import probes | still blocked / pending | Source-only audits completed, but no `uv sync` or import probe was run for heavy model envs in this task. | Run isolated probes for `envs/autogaze`, `envs/ov-encoder`, `envs/llava-ov2`, `envs/lmms-eval`, and optional `envs/mps-probe`. |
 | `flash_attn` requirements | partially resolved | bridge-core does not require it. AutoGaze declares it. LLaVA-OV2 and OneVision source show fallback-capable code paths, but defaults/examples are FlashAttention-oriented. | Confirm `sdpa`/`eager` import behavior in isolated model env probes. |
@@ -32,7 +32,7 @@ Public weight download readiness:
 
 Required before actual downloads:
 
-- User must explicitly request the weight-download task.
+- User must explicitly request the weight-download task and set the allow/target flags.
 - `VTC_ALLOW_WEIGHT_DOWNLOAD=1` must be set.
 - Sufficient disk space must be confirmed.
 - `HF_TOKEN` is optional for the currently visible public repos but may still be useful for rate limits.
