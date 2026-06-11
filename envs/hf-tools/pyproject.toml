@@ -1,0 +1,13 @@
+[project]
+name = "vtc-hf-tools-env"
+version = "0.1.0"
+description = "Token-safe Hugging Face tooling environment for VTC downloads."
+requires-python = ">=3.11"
+dependencies = [
+    "huggingface-hub>=0.36.0",
+    "tqdm>=4.66",
+]
+
+[tool.uv]
+package = false
+
