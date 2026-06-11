@@ -111,8 +111,16 @@ def current_git_commit(cwd: str | Path | None = None) -> str | None:
     return result.stdout.strip() or None
 
 
-def create_environment_record(env_name: str) -> dict[str, Any]:
-    cuda_available, mps_available, torch_version = _optional_torch_environment()
+def create_environment_record(
+    env_name: str,
+    *,
+    include_optional_torch: bool = True,
+) -> dict[str, Any]:
+    if include_optional_torch:
+        cuda_available, mps_available, torch_version = _optional_torch_environment()
+    else:
+        cuda_available, mps_available, torch_version = None, None, None
+
     return {
         "env_name": env_name,
         "platform": platform.platform(),
@@ -170,6 +178,7 @@ def create_profile_record(
     run_id: str | None = None,
     created_at_utc: str | None = None,
     environment: Mapping[str, Any] | None = None,
+    include_optional_torch_environment: bool = True,
 ) -> dict[str, Any]:
     if track not in ALLOWED_TRACKS:
         allowed = ", ".join(sorted(ALLOWED_TRACKS))
@@ -204,7 +213,13 @@ def create_profile_record(
             "track": track,
             "policy_name": policy_name,
         },
-        "environment": _merge_defaults(create_environment_record(env_name), environment),
+        "environment": _merge_defaults(
+            create_environment_record(
+                env_name,
+                include_optional_torch=include_optional_torch_environment,
+            ),
+            environment,
+        ),
         "input": _merge_defaults(_input_defaults(), input_metadata),
         "token_counts": merged_token_counts,
         "compression": merged_compression,
