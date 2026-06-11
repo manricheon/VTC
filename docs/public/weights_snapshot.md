@@ -1,8 +1,8 @@
 # Hugging Face Weights Snapshot
 
-Snapshot date: `2026-06-11T06:15:22Z`
+Snapshot date: `2026-06-11T07:41:51Z`
 
-No model inference was run. No weights were downloaded in this pass because `VTC_ALLOW_WEIGHT_DOWNLOAD` was not set to `1`.
+No model inference was run by the weight setup helper. Downloaded files, if any, remain under `weights/` and must not be committed.
 
 ## Preflight
 
@@ -14,36 +14,28 @@ Cache policy:
 Authentication:
 
 - `HF_TOKEN`: not set
-- Hugging Face CLI login under `HF_HOME`: not authenticated
-- Public-only metadata/code access is available; private or gated repos still require user authentication.
+- Token used field below records only whether `HF_TOKEN` was present; it never contains the token value.
 
 Disk:
 
-- Repository filesystem: 460 GiB total, 397 GiB used, 40 GiB available.
-- `weights/` filesystem: same mount, 40 GiB available.
-- No disk blocker was observed for the preflight itself, but disk must be rechecked before large downloads.
+- Repository filesystem: 23Gi available on /dev/disk3s5
+- `weights/` filesystem: 23Gi available on /dev/disk3s5
 
 Download flags:
 
-- `VTC_ALLOW_WEIGHT_DOWNLOAD`: not set
-- `VTC_DOWNLOAD_AUTOGAZE`: not set
-- `VTC_DOWNLOAD_OV_ENCODER`: not set
-- `VTC_DOWNLOAD_LLAVA_OV2`: not set
-- `VTC_ALLOW_LLAVA_OV2_DOWNLOAD`: not set
-
-Checkpoint directories:
-
-- `weights/checkpoints/AutoGaze`: exists, `0B`
-- `weights/checkpoints/onevision-encoder-large`: exists, `0B`
-- `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct`: exists, `0B`
+- `VTC_ALLOW_WEIGHT_DOWNLOAD`: 1
+- `VTC_DOWNLOAD_AUTOGAZE`: 1
+- `VTC_DOWNLOAD_OV_ENCODER`: 1
+- `VTC_DOWNLOAD_LLAVA_OV2`: 1
+- `VTC_ALLOW_LLAVA_OV2_DOWNLOAD`: 1
 
 ## Snapshot Table
 
-| Target name | Repo id | Local path | Status | Snapshot revision | File count | Approx total size | Date | Token used | Next action |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AutoGaze | `nvidia/AutoGaze` | `weights/checkpoints/AutoGaze` | `skipped` | not downloaded | 0 | 0B local | `2026-06-11T06:15:22Z` | no | Set `VTC_ALLOW_WEIGHT_DOWNLOAD=1` and `VTC_DOWNLOAD_AUTOGAZE=1`, then rerun. |
-| OneVision-Encoder | `lmms-lab-encoder/onevision-encoder-large` | `weights/checkpoints/onevision-encoder-large` | `skipped` | not downloaded | 0 | 0B local | `2026-06-11T06:15:22Z` | no | Set `VTC_ALLOW_WEIGHT_DOWNLOAD=1` and `VTC_DOWNLOAD_OV_ENCODER=1`, then rerun. |
-| LLaVA-OV2 | `lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct` | `skipped` | not downloaded | 0 | 0B local | `2026-06-11T06:15:22Z` | no | Set `VTC_ALLOW_WEIGHT_DOWNLOAD=1`, `VTC_DOWNLOAD_LLAVA_OV2=1`, and `VTC_ALLOW_LLAVA_OV2_DOWNLOAD=1`, then rerun. |
+| Target name | Repo id | Local path | Status | Snapshot revision | File count | Payload file count | Approx total size | Date | Token used | Next action |
+| --- | --- | --- | --- | --- | ---: | ---: | --- | --- | --- | --- |
+| AutoGaze | `nvidia/AutoGaze` | `weights/checkpoints/AutoGaze` | `downloaded` | `default` | 15 | 1 | 13M | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
+| OneVision-Encoder | `lmms-lab-encoder/onevision-encoder-large` | `weights/checkpoints/onevision-encoder-large` | `downloaded` | `default` | 19 | 1 | 602M | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
+| LLaVA-OV2 | `lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct` | `downloaded` | `default` | 51 | 4 | 16G | `2026-06-11T07:41:51Z` | no | No action if payload files are present; otherwise inspect download output and rerun. |
 
 ## Rerun Commands
 
@@ -53,8 +45,7 @@ AutoGaze:
 source scripts/env_weights.sh
 VTC_ALLOW_WEIGHT_DOWNLOAD=1 \
 VTC_DOWNLOAD_AUTOGAZE=1 \
-VTC_AUTOGAZE_REPO=nvidia/AutoGaze \
-bash scripts/hf_download_weights.sh
+bash scripts/setup_hf_assets.sh
 ```
 
 OneVision-Encoder:
@@ -63,7 +54,7 @@ OneVision-Encoder:
 source scripts/env_weights.sh
 VTC_ALLOW_WEIGHT_DOWNLOAD=1 \
 VTC_DOWNLOAD_OV_ENCODER=1 \
-bash scripts/hf_download_weights.sh
+bash scripts/setup_hf_assets.sh
 ```
 
 LLaVA-OV2:
@@ -73,45 +64,20 @@ source scripts/env_weights.sh
 VTC_ALLOW_WEIGHT_DOWNLOAD=1 \
 VTC_DOWNLOAD_LLAVA_OV2=1 \
 VTC_ALLOW_LLAVA_OV2_DOWNLOAD=1 \
-bash scripts/hf_download_weights.sh
+bash scripts/setup_hf_assets.sh
 ```
 
-All three public-visible targets in one pass:
+All selected public-visible targets in one pass:
 
 ```bash
 source scripts/env_weights.sh
 VTC_ALLOW_WEIGHT_DOWNLOAD=1 \
 VTC_DOWNLOAD_AUTOGAZE=1 \
-VTC_AUTOGAZE_REPO=nvidia/AutoGaze \
 VTC_DOWNLOAD_OV_ENCODER=1 \
 VTC_DOWNLOAD_LLAVA_OV2=1 \
 VTC_ALLOW_LLAVA_OV2_DOWNLOAD=1 \
-bash scripts/hf_download_weights.sh
+bash scripts/setup_hf_assets.sh
 ```
-
-## Auth and Gating Notes
-
-No gated or authentication blocker was encountered during this pass because downloads were skipped before contacting the Hub for payload files.
-
-If a future run fails with gated or private access:
-
-1. Request/accept access for the specific repo on Hugging Face.
-2. Authenticate without committing tokens:
-
-```bash
-source scripts/env_weights.sh
-cd envs/hf-tools
-uv run hf auth login
-cd ../..
-```
-
-or export `HF_TOKEN` only in the current shell:
-
-```bash
-export HF_TOKEN=<token>
-```
-
-Never paste tokens into project files.
 
 ## Current Readiness
 
@@ -120,13 +86,8 @@ Ready for environment compatibility probes:
 - bridge-core remains ready.
 - model-env import probes that do not require weights can proceed.
 
-Not ready for weight-backed model probes:
+Weight-backed model probes can proceed only for rows marked `downloaded`, and only after the matching isolated model env is synced/probed:
 
-- AutoGaze weights are absent.
-- OneVision-Encoder weights are absent.
-- LLaVA-OV2 weights are absent.
-
-Also unresolved before codec/generation:
-
-- Linux `ffmpeg` is still missing or not verified.
-- CUDA/attention-backend compatibility is still unverified.
+- AutoGaze requires payload files under `weights/checkpoints/AutoGaze`.
+- OneVision-Encoder requires payload files under `weights/checkpoints/onevision-encoder-large`.
+- LLaVA-OV2 requires payload files under `weights/checkpoints/LLaVA-OneVision-2-8B-Instruct`.

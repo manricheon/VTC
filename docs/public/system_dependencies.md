@@ -1,22 +1,28 @@
 # System Dependencies
 
-Check date: `2026-06-11T06:10:32Z`
+Check date: `2026-06-11T07:28:02Z`
 
-VTC remains Linux-first. The current check was run on the local development host and does not replace verification on the official Linux target.
+VTC remains Linux-first. The current check was run on the local macOS development host and does not replace verification on the official Linux target.
 
 ## Current Host
 
-Command:
+Commands:
 
 ```bash
 uname -a
-cat /etc/os-release || true
+if [ -f /etc/os-release ]; then cat /etc/os-release; fi
+sw_vers 2>/dev/null || true
+command -v ffmpeg || true
+ffmpeg -version || true
 ```
 
 Result:
 
-- `uname -a`: `Darwin mrcui-MacBookAir.local 25.4.0 Darwin Kernel Version 25.4.0: Thu Mar 19 19:32:36 PDT 2026; root:xnu-12377.101.15~1/RELEASE_ARM64_T8103 arm64`
+- Platform: `Darwin mrcui-MacBookAir.local 25.4.0 ... arm64`
+- macOS: `26.4.1`
 - `/etc/os-release`: not available on this host
+- `ffmpeg`: not found on `PATH`
+- `ALLOW_SYSTEM_INSTALL`: not set, so no install was attempted
 
 Official target status:
 
@@ -25,27 +31,19 @@ Official target status:
 
 ## ffmpeg Status
 
-Commands run:
+Status: `missing_or_unverified`
 
-```bash
-command -v ffmpeg || true
-ffmpeg -version || true
-```
+Detected path: not available.
 
-Result:
+Detected version: not available.
 
-- `command -v ffmpeg`: no path found
-- `ffmpeg -version`: `command not found`
-- Detected ffmpeg path: not available
-- Detected ffmpeg version: not available
-- Installation status: not installed by this task
-- `ALLOW_SYSTEM_INSTALL`: not set
+Installation status: not installed by this task.
 
-Classification:
+Codec/backend impact:
 
-- `ffmpeg` is unresolved for codec/backend tests on the current host.
-- Linux target status remains not verified.
-- The LLaVA-OV2 codec workflow remains blocked until `ffmpeg` is installed and verified on the target runtime.
+- Project A and Project B pure-Python synthetic tests do not require `ffmpeg`.
+- LLaVA-OV2 codec/backend preprocessing remains blocked until `ffmpeg` is installed and verified.
+- Later real video decode and `lmms-eval` video workflows should treat `ffmpeg` as required.
 
 ## System Dependency Checker
 
@@ -57,33 +55,31 @@ bash scripts/check_system_deps.sh
 
 The checker reports:
 
+- `bash`
 - `git`
 - `curl`
+- `uv`
+- `python`
+- `python3`
 - `ffmpeg`
 
-It does not install anything.
-
-By default it exits 0 after reporting missing dependencies. To make missing dependencies fail CI or a setup gate:
+By default it exits 0 after reporting missing dependencies. To make missing required dependencies fail a setup gate:
 
 ```bash
 REQUIRED_SYSTEM_DEPS=1 bash scripts/check_system_deps.sh
 ```
 
-## Why ffmpeg Matters
-
-The LLaVA-OV2 HF custom-code codec module `codec_video_processing_llava_onevision2.py` documents that codec preprocessing invokes `codec-video-prep` / `cv-preinfer` and requires `ffmpeg` on `PATH`.
-
-Level 1 bridge-core tests do not require `ffmpeg`.
-
-Expected `ffmpeg` requirement:
-
-- Not required for pure Python Project A/B synthetic tests.
-- Required for LLaVA-OV2 codec backend video preprocessing.
-- Likely required for later real video decode and benchmark workflows.
+If `ALLOW_SYSTEM_INSTALL=1` is set, the checker may attempt an `ffmpeg` install through a supported system package manager. It does not use `sudo` unless `ALLOW_SYSTEM_INSTALL=1` is set.
 
 ## Manual Install Commands
 
 Do not run these automatically unless a task explicitly allows system installation.
+
+macOS Homebrew:
+
+```bash
+brew install ffmpeg
+```
 
 Ubuntu/Debian:
 
@@ -91,7 +87,7 @@ Ubuntu/Debian:
 sudo apt-get update && sudo apt-get install -y ffmpeg
 ```
 
-RHEL/CentOS/Fedora:
+Fedora/RHEL:
 
 ```bash
 sudo dnf install -y ffmpeg
