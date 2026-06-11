@@ -1,4 +1,4 @@
-"""JSON/NPY artifact helpers for Project A."""
+"""JSON/NPY artifact helpers for bridge artifacts."""
 
 from __future__ import annotations
 
@@ -25,6 +25,12 @@ def _read_json(path: str | Path) -> Any:
         return json.load(handle)
 
 
+def _write_npy(array: Any, path: str | Path, *, dtype: Any | None = None) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    np.save(output_path, np.asarray(array, dtype=dtype))
+
+
 def write_decoded_entries(entries: Sequence[Mapping[str, Any]], path: str | Path) -> None:
     _write_json(list(entries), path)
 
@@ -48,9 +54,7 @@ def read_selected_blocks(path: str | Path) -> list[tuple[int, int, int]]:
 
 
 def write_src_positions(src_positions: np.ndarray | Sequence[Sequence[int]], path: str | Path) -> None:
-    output_path = Path(path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    np.save(output_path, np.asarray(src_positions, dtype=np.int64))
+    _write_npy(src_positions, path, dtype=np.int64)
 
 
 def read_src_positions(path: str | Path) -> np.ndarray:
@@ -65,4 +69,31 @@ def read_stats(path: str | Path) -> dict[str, Any]:
     data = _read_json(path)
     if not isinstance(data, dict):
         raise ValueError("stats artifact must contain an object")
+    return dict(data)
+
+
+def write_patch_positions(patch_positions: np.ndarray | Sequence[Sequence[float]], path: str | Path) -> None:
+    _write_npy(patch_positions, path)
+
+
+def read_patch_positions(path: str | Path) -> np.ndarray:
+    return np.load(Path(path))
+
+
+def write_patches(patches: np.ndarray, path: str | Path) -> None:
+    _write_npy(patches, path)
+
+
+def read_patches(path: str | Path) -> np.ndarray:
+    return np.load(Path(path))
+
+
+def write_pack_plan(pack_plan: Mapping[str, Any], path: str | Path) -> None:
+    _write_json(dict(pack_plan), path)
+
+
+def read_pack_plan(path: str | Path) -> dict[str, Any]:
+    data = _read_json(path)
+    if not isinstance(data, dict):
+        raise ValueError("pack_plan artifact must contain an object")
     return dict(data)

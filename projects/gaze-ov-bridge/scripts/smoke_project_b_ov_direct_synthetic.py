@@ -18,7 +18,13 @@ from typing import Any
 import numpy as np
 
 from gaze_ov_bridge.autogaze_decode import decode_flat_ids
-from gaze_ov_bridge.io_artifacts import write_decoded_entries, write_stats
+from gaze_ov_bridge.io_artifacts import (
+    write_decoded_entries,
+    write_pack_plan,
+    write_patch_positions,
+    write_patches,
+    write_stats,
+)
 from gaze_ov_bridge.memory_probe import collect_memory_mb
 from gaze_ov_bridge.ov_direct import build_ov_direct_plan
 from gaze_ov_bridge.ov_pack import build_ov_pack_plan
@@ -26,7 +32,6 @@ from gaze_ov_bridge.ov_patch_extract import extract_ov_direct_patches
 from gaze_ov_bridge.profile_schema import (
     create_profile_record,
     current_git_commit,
-    json_ready,
     write_profile_json,
 )
 from gaze_ov_bridge.profiling import StageTimer
@@ -37,18 +42,6 @@ SCRIPT_PATH = Path(__file__).resolve()
 PROJECT_ROOT = SCRIPT_PATH.parents[1]
 VTC_ROOT = SCRIPT_PATH.parents[3]
 DEFAULT_OUT_DIR = PROJECT_ROOT / "out" / "smoke_project_b_ov_direct_synthetic"
-
-
-def _write_json(data: Any, path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(json_ready(data), handle, indent=2, sort_keys=True, allow_nan=False)
-        handle.write("\n")
-
-
-def _write_npy(array: np.ndarray, path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    np.save(path, array)
 
 
 def _synthetic_autogaze_output() -> tuple[np.ndarray, np.ndarray, int]:
@@ -175,9 +168,9 @@ def run_smoke(out_dir: Path) -> dict[str, Any]:
 
         write_decoded_entries(decoded_entries, out_dir / "decoded_entries.json")
         write_stats(stats, out_dir / "stats.json")
-        _write_npy(patch_positions, out_dir / "patch_positions.npy")
-        _write_npy(patches, out_dir / "patches.npy")
-        _write_json(pack_plan, out_dir / "pack_plan.json")
+        write_patch_positions(patch_positions, out_dir / "patch_positions.npy")
+        write_patches(patches, out_dir / "patches.npy")
+        write_pack_plan(pack_plan, out_dir / "pack_plan.json")
 
     profile = create_profile_record(
         project_name="gaze-ov-bridge",

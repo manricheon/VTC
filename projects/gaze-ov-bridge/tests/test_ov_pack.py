@@ -48,6 +48,15 @@ def test_pack_slots_span_multiple_canvases_stably():
     }
 
 
+def test_pack_zero_tokens_has_no_padding_metadata():
+    plan = build_ov_pack_plan(num_tokens=0)
+
+    assert plan["num_canvases"] == 0
+    assert plan["total_slots"] == 0
+    assert plan["total_padding_slots"] == 0
+    assert plan["tokens"] == []
+
+
 def test_pack_rejects_negative_token_counts():
     with pytest.raises(ValueError, match="num_tokens"):
         build_ov_pack_plan(num_tokens=-1)
