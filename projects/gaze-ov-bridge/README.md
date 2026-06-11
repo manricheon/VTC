@@ -46,3 +46,44 @@ Profiling is part of every smoke and integration stage. Synthetic smoke scripts 
 - Runtime dependencies are limited to `numpy>=1.24` and `pillow>=10.0`.
 - Test dependency is limited to `pytest>=8.0`.
 - Do not add `torch`, `transformers`, AutoGaze, OneVision-Encoder, LLaVA-OV2, `lmms-eval`, or `flash_attn` yet.
+
+## Current Usage
+
+Project A usage:
+
+```bash
+bash scripts/run_project_a_examples.sh
+```
+
+This runs the synthetic codec smoke and LLaVA boundary validation. It does not
+run LLaVA-OV2 generation. See
+[docs/public/usage_project_a.md](../../docs/public/usage_project_a.md).
+
+Project B usage:
+
+```bash
+bash scripts/run_project_b_examples.sh
+```
+
+This runs the synthetic OV-direct smoke and OV boundary validation. It does not
+run OV-Encoder forward. See
+[docs/public/usage_project_b.md](../../docs/public/usage_project_b.md).
+
+All current safe smokes:
+
+```bash
+bash scripts/run_all_smokes.sh
+bash scripts/run_profile_summaries.sh
+```
+
+## Boundary vs Runtime
+
+The current bridge is boundary-ready:
+
+- Project A validates `decoded_entries -> selected_112_blocks -> src_positions -> LLaVA-compatible payload`.
+- Project B validates `decoded_entries -> patches -> patch_positions -> pack_plan`.
+
+The bridge is not yet runtime-ready for real AutoGaze, LLaVA-OV2,
+OneVision-Encoder, or lmms-eval execution. Those paths require isolated model
+env sync, Linux runtime checks, attention backend verification, and model/dataset
+runtime gates.
