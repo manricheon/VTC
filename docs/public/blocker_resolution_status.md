@@ -1,6 +1,6 @@
 # Blocker Resolution Status
 
-Status date: `2026-06-11T06:01:56Z`
+Status date: `2026-06-11T06:10:32Z`
 
 No model weights were downloaded, no model inference was run, no heavy Python dependencies were installed, and no push was performed.
 
@@ -15,7 +15,7 @@ No model weights were downloaded, no model inference was run, no heavy Python de
 | `bfshi/AutoGaze` ambiguity | partially resolved | Source quick-start references it, but public HF metadata/listing returned model not found / 401 with no token. | Treat as stale/private/renamed unless user provides access or new evidence. |
 | HF token/access | still blocked for private/gated repos | `HF_TOKEN` is not set; HF CLI login under `HF_HOME` is unauthenticated. Public metadata/code snapshots worked. | User must authenticate before any private/gated repo download. |
 | Weight downloads | intentionally deferred | No `.safetensors`, `.bin`, `.pt`, `.pth`, `.gguf`, or `.onnx` files found under `weights/` or `external/`. | Run explicit weight-download task with `VTC_ALLOW_WEIGHT_DOWNLOAD=1`. |
-| Linux ffmpeg/system dependency | still blocked / needs ffmpeg install | Current host has no `ffmpeg` on `PATH`; Linux target not yet verified. | Install/verify `ffmpeg` on Linux before codec/backend tests. |
+| Linux ffmpeg/system dependency | still blocked / needs ffmpeg install | Current host is Darwin and has no `ffmpeg` on `PATH`; `/etc/os-release` is unavailable; Linux target not yet verified. `ALLOW_SYSTEM_INSTALL` was not set, so no system install was attempted. | Install/verify `ffmpeg` on Linux before codec/backend tests. Use `bash scripts/check_system_deps.sh` to report status, or `REQUIRED_SYSTEM_DEPS=1 bash scripts/check_system_deps.sh` for a failing gate. |
 | Model-env import probes | still blocked / pending | Source-only audits completed, but no `uv sync` or import probe was run for heavy model envs in this task. | Run isolated probes for `envs/autogaze`, `envs/ov-encoder`, `envs/llava-ov2`, `envs/lmms-eval`, and optional `envs/mps-probe`. |
 | `flash_attn` requirements | partially resolved | bridge-core does not require it. AutoGaze declares it. LLaVA-OV2 and OneVision source show fallback-capable code paths, but defaults/examples are FlashAttention-oriented. | Confirm `sdpa`/`eager` import behavior in isolated model env probes. |
 | CUDA availability | still blocked / target-dependent | No CUDA checks were run; official model runs remain Linux/CUDA-oriented where FlashAttention is mandatory. | Verify on Linux CUDA machine after dependencies and weights are available. |
@@ -42,3 +42,5 @@ Required before codec/backend inference:
 - Verify/install `ffmpeg` on Linux.
 - Run isolated model-env dependency/import probes.
 - Resolve any `flash_attn`/attention backend failures in the relevant isolated env.
+
+Manual `ffmpeg` install commands are documented in `docs/public/system_dependencies.md`.

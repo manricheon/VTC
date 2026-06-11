@@ -1,8 +1,27 @@
 # System Dependencies
 
-Check date: `2026-06-11T06:01:56Z`
+Check date: `2026-06-11T06:10:32Z`
 
 VTC remains Linux-first. The current check was run on the local development host and does not replace verification on the official Linux target.
+
+## Current Host
+
+Command:
+
+```bash
+uname -a
+cat /etc/os-release || true
+```
+
+Result:
+
+- `uname -a`: `Darwin mrcui-MacBookAir.local 25.4.0 Darwin Kernel Version 25.4.0: Thu Mar 19 19:32:36 PDT 2026; root:xnu-12377.101.15~1/RELEASE_ARM64_T8103 arm64`
+- `/etc/os-release`: not available on this host
+
+Official target status:
+
+- Linux remains the official target.
+- Linux `ffmpeg` status is not verified until these checks are run on the Linux machine.
 
 ## ffmpeg Status
 
@@ -17,13 +36,38 @@ Result:
 
 - `command -v ffmpeg`: no path found
 - `ffmpeg -version`: `command not found`
+- Detected ffmpeg path: not available
 - Detected ffmpeg version: not available
-- Install attempted: no
+- Installation status: not installed by this task
+- `ALLOW_SYSTEM_INSTALL`: not set
 
 Classification:
 
-- `ffmpeg` is currently a system dependency blocker for codec/backend tests on this host.
-- Linux target status is still not verified until the same commands are run on the Linux machine.
+- `ffmpeg` is unresolved for codec/backend tests on the current host.
+- Linux target status remains not verified.
+- The LLaVA-OV2 codec workflow remains blocked until `ffmpeg` is installed and verified on the target runtime.
+
+## System Dependency Checker
+
+Use:
+
+```bash
+bash scripts/check_system_deps.sh
+```
+
+The checker reports:
+
+- `git`
+- `curl`
+- `ffmpeg`
+
+It does not install anything.
+
+By default it exits 0 after reporting missing dependencies. To make missing dependencies fail CI or a setup gate:
+
+```bash
+REQUIRED_SYSTEM_DEPS=1 bash scripts/check_system_deps.sh
+```
 
 ## Why ffmpeg Matters
 
@@ -37,7 +81,7 @@ Expected `ffmpeg` requirement:
 - Required for LLaVA-OV2 codec backend video preprocessing.
 - Likely required for later real video decode and benchmark workflows.
 
-## Install Commands
+## Manual Install Commands
 
 Do not run these automatically unless a task explicitly allows system installation.
 
@@ -66,6 +110,7 @@ After installation on the Linux target:
 ```bash
 command -v ffmpeg
 ffmpeg -version
+bash scripts/check_system_deps.sh
 ```
 
-Record the output before running codec/backend smoke tests.
+Record the path and version before running codec/backend smoke tests.
