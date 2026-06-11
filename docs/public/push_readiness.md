@@ -11,7 +11,7 @@ Date: 2026-06-12
 ## Current State
 
 - Current branch: `feature/gaze-ov-bridge-local`
-- Latest commit checked: `874362c`
+- Latest commit checked: `37c8b38`
 - Remote URL: `git@github.com:manricheon/VTC.git`
 - Dirty state: clean after removing storage-root placeholders from Git tracking.
 
@@ -30,7 +30,29 @@ git@github.com: Permission denied (publickey).
 fatal: Could not read from remote repository.
 ```
 
-Status before escalated push attempt: blocked by SSH authentication or repository access in the sandboxed check. The user requested retrying the push outside the sandbox.
+Status after outside-sandbox push attempt: blocked by GitHub authentication.
+
+Outside-sandbox push command:
+
+```bash
+git push -u origin feature/gaze-ov-bridge-local
+```
+
+Result:
+
+```text
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+```
+
+Additional auth check:
+
+```text
+ssh -T git@github.com
+git@github.com: Permission denied (publickey).
+```
+
+GitHub CLI status also reports the local `gh` token for `manricheon` is invalid and should be refreshed with `gh auth login -h github.com`.
 
 ## Dangerous Tracked File Check
 
@@ -139,7 +161,7 @@ projects/gaze-ov-bridge/prompts/.gitkeep
 
 ## Recommendation
 
-- `safe_to_push`: yes, pending successful GitHub SSH authentication outside the sandbox.
+- `safe_to_push`: yes from repository-content checks, but push is blocked by GitHub authentication.
 - Push scope:
   - push only `feature/gaze-ov-bridge-local`
   - do not push `main`
