@@ -1,0 +1,21 @@
+[project]
+name = "vtc-ov-encoder-env"
+version = "0.1.0"
+description = "Isolated OneVision-Encoder direct-path probe environment for VTC."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pillow",
+    "torch",
+    "transformers==4.57.3",
+]
+
+[project.optional-dependencies]
+video = [
+    "av",
+    "opencv-python",
+]
+
+[tool.uv]
+package = false
+

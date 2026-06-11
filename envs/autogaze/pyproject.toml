@@ -1,0 +1,33 @@
+[project]
+name = "vtc-autogaze-env"
+version = "0.1.0"
+description = "Isolated AutoGaze source/probe environment for VTC."
+requires-python = ">=3.11"
+dependencies = [
+    "av",
+    "einops",
+    "hydra-core>=1.3.2",
+    "imageio",
+    "loguru",
+    "matplotlib",
+    "numpy",
+    "omegaconf",
+    "pillow",
+    "timm>=1.0.15",
+    "torch",
+    "torchvision",
+    "tqdm",
+    "transformers~=4.51",
+    "wandb",
+]
+
+[project.optional-dependencies]
+cuda = [
+    # AutoGaze upstream metadata currently declares flash_attn. Keep it explicit
+    # until the source/probe audit confirms whether SDPA/eager fallback is enough.
+    "flash-attn",
+]
+
+[tool.uv]
+package = false
+

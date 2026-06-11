@@ -1,0 +1,17 @@
+[project]
+name = "vtc-mps-probe-env"
+version = "0.1.0"
+description = "Optional Mac/MPS lightweight probe environment for VTC."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pillow",
+]
+
+[project.optional-dependencies]
+torch = [
+    "torch",
+]
+
+[tool.uv]
+package = false

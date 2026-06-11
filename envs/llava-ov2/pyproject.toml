@@ -1,0 +1,23 @@
+[project]
+name = "vtc-llava-ov2-env"
+version = "0.1.0"
+description = "Isolated LLaVA-OneVision-2 processor/backend probe environment for VTC."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pillow",
+    "qwen-vl-utils",
+    "torch>=2.4",
+    "transformers>=5.7.0",
+]
+
+[project.optional-dependencies]
+video = [
+    "codec-video-prep",
+    "decord",
+    "opencv-python",
+]
+
+[tool.uv]
+package = false
+
