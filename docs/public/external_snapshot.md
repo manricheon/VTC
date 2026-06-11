@@ -1,122 +1,206 @@
 # External Source Snapshot
 
-Snapshot date: `2026-06-11T05:00:20Z`
+Snapshot date: `2026-06-11T06:01:56Z`
 
-This snapshot records source-only external repositories under `external/`. The `external/` directory is ignored and is not committed. No model inference was run, no heavy dependencies were installed, and no model weight payload files were downloaded.
+This snapshot records source-only external repositories and code-only Hugging Face snapshots under `external/`. The `external/` directory is ignored and must not be committed. No model inference was run, no heavy dependencies were installed, and no model weight payload files were downloaded.
 
 ## Snapshot Table
 
-| Repo name | Local path | Remote URL | Branch | Commit hash | Purpose | Source-only | Weights downloaded |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| AutoGaze | `external/AutoGaze` | `https://github.com/NVlabs/AutoGaze.git` | `main` | `ba48d0f94ac2929d6fe3ee4380dc893aa6eed0ab` | AutoGaze source audit for output generation and artifact serialization. | yes | no |
-| LLaVA-OneVision-2 | `external/LLaVA-OneVision-2` | `https://github.com/EvolvingLMMs-Lab/LLaVA-OneVision-2.git` | `main` | `ee337788824119dc1fed9fa5e461867ed01057c0` | LLaVA-OV2 source audit, codec/backend review, and bundled OneVision-Encoder custom-code inspection. | yes | no |
-| lmms-eval | `external/lmms-eval` | `https://github.com/EvolvingLMMs-Lab/lmms-eval.git` | `llava-onevision2` | `3997a60cb8e79d9341ac1e4a286f0bb739bcc779` | Later `llava_onevision2` benchmark adapter and profiling hook audit. | yes | no |
-| LLaVA-OneVision-2-8B-Instruct custom code | `external/LLaVA-OneVision-2-8B-Instruct-code` | `https://huggingface.co/lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `main` | `5a75eaf7d3cd73de6f85e637e45b420f46857d2e` | Code/config-only Hugging Face custom-code snapshot for LLaVA-OV2. | yes | no |
+| Repo name | Target path | Source URL or HF repo id | Branch/revision | Commit hash or HF revision | Status | Purpose | Source-only | Weights downloaded | Blockers |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AutoGaze | `external/AutoGaze` | `https://github.com/NVlabs/AutoGaze.git` | `main` | `ba48d0f94ac2929d6fe3ee4380dc893aa6eed0ab` | `already_present` | AutoGaze source audit for output generation and artifact serialization. | yes | no | none |
+| LLaVA-OneVision-2 | `external/LLaVA-OneVision-2` | `https://github.com/EvolvingLMMs-Lab/LLaVA-OneVision-2.git` | `main` | `ee337788824119dc1fed9fa5e461867ed01057c0` | `already_present` | LLaVA-OV2 source audit, processor/backend review, and bundled OneVision-Encoder source inspection. | yes | no | none |
+| lmms-eval | `external/lmms-eval` | `https://github.com/EvolvingLMMs-Lab/lmms-eval.git` | `llava-onevision2` | `3997a60cb8e79d9341ac1e4a286f0bb739bcc779` | `already_present` | `llava_onevision2` benchmark adapter and profiling hook audit. | yes | no | none |
+| LLaVA-OneVision-2-8B-Instruct custom code | `external/LLaVA-OneVision-2-8B-Instruct-code` | `lmms-lab-encoder/LLaVA-OneVision-2-8B-Instruct` | `main` | `5a75eaf7d3cd73de6f85e637e45b420f46857d2e` | `downloaded_code_only` | Code/config/text Hugging Face custom-code snapshot for LLaVA-OV2. | yes | no | none |
+| OneVision-Encoder custom code | `external/OneVision-Encoder` | `lmms-lab-encoder/onevision-encoder-large` | `main` | `9908b86a6c651379df4a0b0a7ecfccc6afcd544e` | `downloaded_code_only` | Code/config/text Hugging Face custom-code snapshot for Project B source inspection. | yes | no | none |
 
-## Setup Notes
+The three GitHub clones were fetched with `git fetch --prune` during this pass. Their checked-out commits match their fetched remote branch tips.
 
-- GitHub sources were cloned with `--depth 1`; exact HEAD commit hashes are recorded above.
-- `hf` was not available locally, so the Hugging Face custom-code snapshot used Git.
-- The first Hugging Face partial clone attempt with `--filter=blob:none` failed during checkout with a promisor remote `expected 'packfile'` error.
-- The successful Hugging Face snapshot used `GIT_LFS_SKIP_SMUDGE=1`, `--no-checkout`, sparse checkout patterns for code/config files, and local LFS filter disabling because `git-lfs` is not installed.
-- The checked-out Hugging Face snapshot contains code/config/tokenizer metadata files, including `model.safetensors.index.json`, but no `.safetensors`, `.bin`, `.pt`, `.pth`, `.ckpt`, `.npy`, or `.npz` payload files were present after setup.
-- `external/OneVision-Encoder` was not created in this pass because `external/LLaVA-OneVision-2/transformers_impl/onevision_encoder/` already provides standalone OneVision-Encoder custom code for source inspection. A separate OneVision-Encoder snapshot remains deferred unless later audit work needs a distinct upstream repository or Hugging Face repo.
+File payload check:
 
-## Dependency File Audit
+- No `.safetensors`, `.bin`, `.pt`, `.pth`, `.gguf`, or `.onnx` files were found under `external/`.
+- No `.safetensors`, `.bin`, `.pt`, `.pth`, `.gguf`, or `.onnx` files were found under `weights/`.
+- Hugging Face cache paths remain under `weights/hf_home` through `HF_HOME` and `HF_HUB_CACHE`.
 
-Relevant dependency and requirements files found:
+## Hugging Face Code Snapshots
 
-- `external/AutoGaze/pyproject.toml`
-- `external/LLaVA-OneVision-2/pyproject.toml`
-- `external/LLaVA-OneVision-2/requirements.txt`
-- `external/LLaVA-OneVision-2/aiak_megatron/pyproject.toml`
-- `external/LLaVA-OneVision-2/aiak_megatron/setup.py`
-- `external/LLaVA-OneVision-2/aiak_megatron/megatron/core/requirements.txt`
-- `external/lmms-eval/pyproject.toml`
-- `external/lmms-eval/setup.py`
+`external/LLaVA-OneVision-2-8B-Instruct-code` was refreshed with `scripts/hf_download_code_only.sh`. The target contains code/config/tokenizer text files such as:
 
-Initial findings:
+- `codec_video_processing_llava_onevision2.py`
+- `processing_llava_onevision2.py`
+- `video_processing_llava_onevision2.py`
+- `modeling_llava_onevision2.py`
+- `configuration_llava_onevision2.py`
+- `config.json`
+- `preprocessor_config.json`
+- tokenizer/config text files
 
-- AutoGaze `pyproject.toml` lists `torch`, `torchvision`, `flash_attn`, `hydra-core`, `timm`, `transformers~=4.51`, `av`, and `imageio`.
-- LLaVA-OneVision-2 `requirements.txt` pins `transformers==5.7.0` and includes `accelerate`, `datasets`, `hydra-core`, `megatron-energon`, `qwen_vl_utils`, `timm`, and related training/evaluation utilities.
-- `lmms-eval` `pyproject.toml` has broad benchmark dependencies including `torch>=2.1.0`, `torchvision>=0.16.0`, `transformers>=4.39.2`, `opencv-python-headless`, `av<16.0.0`, `qwen-vl-utils>=0.0.14`, optional `video` extras, and many benchmark packages.
-- These findings reinforce the existing split-environment decision: keep `bridge-core`, `autogaze`, `llava-ov2`, `ov-encoder`, and `lmms-eval` separate.
+It also contains `model.safetensors.index.json`, which is model metadata, not a model weight payload.
 
-## Attention and `flash_attn` Audit
+`external/OneVision-Encoder` was created from `lmms-lab-encoder/onevision-encoder-large` with code/config/text allow patterns and weight payload ignore patterns. It contains:
 
-Search terms used:
+- `README.md`
+- `__init__.py`
+- `config.json`
+- `configuration_onevision_encoder.py`
+- `modeling_onevision_encoder.py`
+- `preprocessor_config.json`
 
-```bash
-rg -n "flash_attn|flash_attention|flash_attention_2|attn_implementation|sdpa|eager" external/...
-```
+The OneVision-Encoder README also references a GitHub source repo at `https://github.com/EvolvingLMMs-Lab/OneVision-Encoder.git`. That separate GitHub repo was not cloned in this task because the requested HF custom-code snapshot is now sufficient for source inspection. Clone it later only if the HF custom-code snapshot is insufficient.
 
-File hit counts:
+## AutoGaze Important Paths
 
-- AutoGaze: 11 files
-- LLaVA-OneVision-2: 37 files
-- lmms-eval: 58 files
-- LLaVA-OneVision-2-8B-Instruct custom code: 3 files
+AutoGaze source commit: `ba48d0f94ac2929d6fe3ee4380dc893aa6eed0ab`.
 
-Initial findings:
+Important source paths:
 
-- AutoGaze declares `flash_attn` as a dependency in `pyproject.toml`. Its quick-start examples instantiate SigLIP models with `attn_implementation="sdpa"`, which suggests an SDPA path exists for at least the shown SigLIP usage, but source import requirements still need a model-environment import probe.
-- LLaVA-OneVision-2 GitHub source includes `transformers_impl/onevision_encoder/modeling_onevision_encoder.py`, which dispatches attention through `config._attn_implementation`, defines `eager_attention_forward`, and declares `_supports_flash_attn = True` and `_supports_sdpa = True`.
-- LLaVA-OneVision-2 GitHub source also includes `transformers_impl/llavaonevision2/modeling_llava_onevision2.py`, which references `eager`, `sdpa`, and `flash_attention_2` through Transformers attention interfaces.
-- The Hugging Face custom-code snapshot `modeling_llava_onevision2.py` imports `is_flash_attention_requested`, defines an eager attention fallback, dispatches via `ALL_ATTENTION_FUNCTIONS`, and declares `_supports_flash_attn = True` and `_supports_sdpa = True`.
-- The `lmms-eval` `llava_onevision2` chat adapter defaults `attn_implementation` to `"flash_attention_2"` when loading the model. Other adapters in the tree accept `sdpa` and `eager`, but the LLaVA-OV2 adapter default should be overridden or audited before CPU/MPS probes.
+- `external/AutoGaze/README.md`: lists `nvidia/AutoGaze` as the official pre-trained AutoGaze model.
+- `external/AutoGaze/QUICK_START.md`: documents runtime output fields and currently references `bfshi/AutoGaze` in sample code.
+- `external/AutoGaze/autogaze/models/autogaze/modeling_autogaze.py`: returns `gazing_pos`, `num_gazing_each_frame`, and `if_padded_gazing`.
+- `external/AutoGaze/autogaze/models/autogaze/autogaze.py`: returns `gazing_pos`, `gazing_mask`, `scales`, `num_gazing_each_frame`, and `if_padded_gazing`.
+- `external/AutoGaze/autogaze/datasets/collate.py`: collates `gazing_pos`, `if_padded_gazing`, and `num_gazing_each_frame`.
+- `external/AutoGaze/autogaze/utils.py`: contains gazing-position utility code.
 
-Current classification:
+Dependency finding:
 
-- `bridge-core`: no `flash_attn` requirement.
-- AutoGaze: likely Linux/CUDA-oriented until import probe proves SDPA/eager operation without `flash_attn`.
-- LLaVA-OV2 custom code: source suggests SDPA/eager support exists, but `lmms-eval` defaults to `flash_attention_2`; use a later import-only probe before any patching.
-- OneVision-Encoder direct path: source supports `patch_positions` and attention dispatch with SDPA support in the GitHub custom code; verify in `envs/ov-encoder`.
+- `external/AutoGaze/pyproject.toml` declares `torch`, `torchvision`, `flash_attn`, `hydra-core`, `wandb`, `loguru`, `timm`, `transformers~=4.51`, `pillow`, `numpy`, `omegaconf`, `matplotlib`, `einops`, `av`, and `imageio`.
 
-## Profiling and Token Audit
+## AutoGaze HF Repo Verification
 
-Search terms used:
+Candidate checks were run in public-only mode with no `HF_TOKEN` set.
 
-```bash
-rg -n "profiling|benchmark|latency|token|memory|max_memory|generate|codec|image_grid_thw|patch_positions" external/...
-```
+Verified candidate:
 
-File hit counts:
+- `nvidia/AutoGaze`
+- HF metadata status: public, `gated=false`, `private=false`
+- HF revision: `5100fae739ec1bf3f875914fa1b703846a18943a`
+- HF config summary: `model_type="autogaze"`
+- Listed files: `.gitattributes`, `LICENSE.md`, `README.md`, `config.json`, `model.safetensors`, `preprocessor_config.json`
 
-- AutoGaze: 21 files
-- LLaVA-OneVision-2: 642 files
-- lmms-eval: 991 files
-- LLaVA-OneVision-2-8B-Instruct custom code: 15 files
+Rejected or unresolved candidate:
 
-Initial findings by source:
+- `bfshi/AutoGaze`
+- `hf models info` returned model not found.
+- `list_repo_files` through the snapshot wrapper returned a 401 repository-not-found/auth error with no token configured.
+- The AutoGaze quick-start still references `bfshi/AutoGaze`, but the README model table identifies `nvidia/AutoGaze` as the official pre-trained model.
 
-- AutoGaze:
-  - Relevant source areas include `autogaze/models/autogaze/`, `autogaze/datasets/collate.py`, and training/task files.
-  - Next audit should locate the exact production of `gazing_pos` and `if_padded_gazing` and add/export token counts by scale.
-- LLaVA-OneVision-2 GitHub source:
-  - `tools/frame_extraction/core/run_cut_frames.py` writes `patch_positions.npy` and metadata for extracted video frames.
-  - `transformers_impl/onevision_encoder/modeling_onevision_encoder.py` accepts `patch_positions` as `[batch_size, seq_len, 3]` and computes RoPE from `[t, h, w]`.
-  - `transformers_impl/llavaonevision2/modeling_llava_onevision2.py` threads `patch_positions` through image/video feature extraction and generation prep paths.
-- Hugging Face LLaVA-OV2 custom code:
-  - `codec_video_processing_llava_onevision2.py` documents the codec backend, calls `codec-video-prep`, validates `image_grid_thw` against `src_patch_position`, converts codec positions to block layout, and rewrites visual text spans based on `patch_positions`.
-  - `video_processing_llava_onevision2.py` builds dense frame-based `patch_positions` for the non-codec backend.
-  - `modeling_llava_onevision2.py` uses explicit `patch_positions` for 3D RoPE and forwards them through image/video feature paths.
-- `lmms-eval`:
-  - `lmms_eval/models/chat/llava_onevision2.py` registers `llava_onevision2`, supports `video_backend="frames"` or `"codec"`, passes `attn_implementation` into `from_pretrained`, and wraps `self.model.generate`.
-  - The same adapter already accumulates `e2e_latency`, `total_tokens`, and `avg_speed` in `generate_until`.
-  - `lmms_eval/evaluator.py` dispatches request types through `getattr(lm, reqtype)(cloned_reqs)`, which is the likely outer hook for per-sample or per-request profile records.
-  - Other chat adapters such as `qwen2_5_vl.py`, `vllm.py`, and `vllm_generate.py` also record latency and token counts, useful as implementation references.
+Decision:
 
-Profiling implications:
+- Use `nvidia/AutoGaze` for the first AutoGaze weight-download attempt.
+- Keep `bfshi/AutoGaze` recorded as a stale, private, renamed, or otherwise inaccessible reference unless the user later provides evidence or HF access that proves it is required.
 
-- Project A LLaVA-OV2 profiling can attach at processor codec preprocessing, model forward, and generate boundaries.
-- Project B OV-Encoder profiling can attach at direct `patch_positions` preparation and vision model forward boundaries.
-- `lmms-eval` profiling can likely append per-sample `profile.jsonl` records inside the model adapter or around evaluator request dispatch.
-- Memory profiling still needs model-environment probes; use torch metrics only after torch is installed in the relevant isolated env.
+## LLaVA-OV2 Important Paths
 
-## Missing Blockers and Deferred Items
+GitHub source commit: `ee337788824119dc1fed9fa5e461867ed01057c0`.
 
-- No required GitHub repo or branch was missing. The `llava-onevision2` branch cloned successfully.
-- `hf` CLI was unavailable, so the Hugging Face snapshot used Git sparse checkout instead.
-- `git-lfs` is unavailable. LFS filters were disabled locally for the Hugging Face code-only checkout; no weight payload files were checked out.
-- `external/OneVision-Encoder` was not created because the LLaVA-OneVision-2 source tree includes `transformers_impl/onevision_encoder/`. A separate standalone source snapshot remains deferred until a distinct authoritative source is required.
-- No dependency installs, model downloads, import probes, or inference runs were performed.
+HF custom-code revision: `5a75eaf7d3cd73de6f85e637e45b420f46857d2e`.
+
+Important source paths:
+
+- `external/LLaVA-OneVision-2/requirements.txt`: pins `transformers==5.7.0` and includes LLaVA-OV2 development dependencies.
+- `external/LLaVA-OneVision-2/transformers_impl/onevision_encoder/modeling_onevision_encoder.py`: bundled OneVision-Encoder implementation with `patch_positions` handling.
+- `external/LLaVA-OneVision-2/transformers_impl/llavaonevision2/modeling_llava_onevision2.py`: LLaVA-OV2 model implementation.
+- `external/LLaVA-OneVision-2-8B-Instruct-code/codec_video_processing_llava_onevision2.py`: codec video preprocessing, `process_codec_video`, and `src_positions` to processor-position conversion.
+- `external/LLaVA-OneVision-2-8B-Instruct-code/processing_llava_onevision2.py`: processor codec branch that produces `pixel_values`, `image_grid_thw`, and `patch_positions`.
+- `external/LLaVA-OneVision-2-8B-Instruct-code/video_processing_llava_onevision2.py`: frame backend dense `patch_positions`.
+- `external/LLaVA-OneVision-2-8B-Instruct-code/modeling_llava_onevision2.py`: model path that consumes `patch_positions` and preserves them through generation expansion.
+
+Codec finding:
+
+- The HF custom-code codec module says the codec path invokes `cv-preinfer` / `codec-video-prep` and requires `ffmpeg` on `PATH`.
+- The codec branch returns `pixel_values`, `image_grid_thw`, and `patch_positions`, matching the Project A codec-compatible artifact target.
+
+## OneVision-Encoder Important Paths
+
+HF custom-code revision: `9908b86a6c651379df4a0b0a7ecfccc6afcd544e`.
+
+Important source paths:
+
+- `external/OneVision-Encoder/README.md`: documents 224 video input usage, 14 patch size, `patch_positions`, and example `attn_implementation="flash_attention_2"`.
+- `external/OneVision-Encoder/config.json`: model config for `onevision_encoder`.
+- `external/OneVision-Encoder/modeling_onevision_encoder.py`: model implementation.
+
+Project B finding:
+
+- `modeling_onevision_encoder.py` implements `VideoRotaryEmbeddingSplit466.forward_from_positions(patch_positions)`.
+- `OneVisionEncoderModel.forward(...)` accepts `visible_indices` and `patch_positions`.
+- If `patch_positions` is provided, the model computes RoPE from the explicit `[t, h, w]` table.
+- This supports the Project B decision to preserve one AutoGaze selected token as one OV direct token with fractional/explicit positions prepared by bridge-core.
+
+## lmms-eval Important Paths
+
+Source commit: `3997a60cb8e79d9341ac1e4a286f0bb739bcc779`.
+
+Important source paths:
+
+- `external/lmms-eval/pyproject.toml`: broad benchmark dependencies including `torch`, `torchvision`, `transformers>=4.39.2`, `opencv-python-headless`, `av<16.0.0`, `qwen-vl-utils`, and optional video extras.
+- `external/lmms-eval/lmms_eval/models/chat/llava_onevision2.py`: registered `llava_onevision2` adapter.
+- `external/lmms-eval/examples/llava_onevision2_repro/run_frames.sh`: frame backend example.
+- `external/lmms-eval/examples/llava_onevision2_repro/run_codec.sh`: codec backend example.
+
+Adapter finding:
+
+- The `llava_onevision2` adapter defaults `attn_implementation` to `flash_attention_2`.
+- It supports `video_backend="frames"` and `video_backend="codec"`.
+- The codec backend imports `process_codec_video`, `drop_padding_canvases`, `codec_positions_for_processor`, and `codec_image_processor_outputs` from the checkpoint custom code.
+- It passes `patch_positions` through the processor output into generation.
+- It already accumulates `e2e_latency` and `total_tokens`, then logs `avg_speed`.
+
+## Attention and flash_attn Findings
+
+AutoGaze:
+
+- `flash_attn` is declared in `pyproject.toml`.
+- QUICK_START SigLIP examples use `attn_implementation="sdpa"` for the customized SigLIP path.
+- This still needs an isolated `envs/autogaze` import probe before assuming CPU/MPS or non-FlashAttention operation.
+
+LLaVA-OV2:
+
+- The HF custom-code model declares `_supports_flash_attn = True` and `_supports_sdpa = True`.
+- The model accepts explicit `patch_positions` and keeps them in generation expansion.
+- `lmms-eval` defaults to `attn_implementation="flash_attention_2"`, so non-CUDA probes must explicitly test `sdpa` or `eager` rather than relying on defaults.
+
+OneVision-Encoder:
+
+- The HF custom-code model imports `flash_attn` inside a guarded `try/except`, so module import itself should not require `flash_attn`.
+- Attention classes include `eager` and `flash_attention_2`.
+- The README examples use `attn_implementation="flash_attention_2"` and `.to("cuda")`.
+- The default/config path appears FlashAttention-oriented; a later import probe must explicitly test `attn_implementation="eager"` for CPU/MPS viability.
+
+bridge-core:
+
+- No `flash_attn`, `torch`, `transformers`, AutoGaze, LLaVA-OV2, OneVision-Encoder, or `lmms-eval` dependency is required.
+
+## Profiling Hook Findings
+
+AutoGaze:
+
+- Export points should be near the returned `gazing_pos`, `if_padded_gazing`, `gazing_mask`, and `num_gazing_each_frame` fields.
+- Token counts by scale can be computed after serialized artifacts are produced; do not import AutoGaze into bridge-core.
+
+LLaVA-OV2:
+
+- Codec preprocessing can be timed around `process_codec_video`, `drop_padding_canvases`, `codec_positions_for_processor`, and processor image output conversion.
+- Model profiling can use stages for `processor`, `model_forward`, and `generate`.
+- Token counts should be taken from bridge artifacts and processor/model inputs, not inferred from text output alone.
+
+OneVision-Encoder:
+
+- Project B profiling can time `patch_extract`, `pack`, and later `model_forward`.
+- The explicit `patch_positions` path is the key hook for preserving sparse multiscale tokens.
+
+lmms-eval:
+
+- The `llava_onevision2` adapter already measures generation latency and output token counts.
+- A later benchmark integration can append per-sample or per-batch `profile.jsonl` records near `generate_until`.
+
+## Remaining Deferred Work
+
+- Download model weights under `weights/checkpoints/...`.
+- Install or verify `ffmpeg` on the official Linux target.
+- Run isolated model-environment uv sync/import probes.
+- Verify `flash_attn`, `sdpa`, and `eager` behavior in actual model environments.
+- Run real AutoGaze output generation.
+- Run real LLaVA-OV2 codec/generation.
+- Run real OneVision-Encoder direct forward.
+- Run `lmms-eval`.
