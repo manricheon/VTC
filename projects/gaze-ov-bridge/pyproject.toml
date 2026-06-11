@@ -9,13 +9,13 @@ description = "Bridge scaffolding for AutoGaze, OneVision-Encoder, and LLaVA-OV2
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
-    "pillow",
+    "numpy>=1.24",
+    "pillow>=10.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
+    "pytest>=8.0",
 ]
 
 [tool.setuptools.packages.find]

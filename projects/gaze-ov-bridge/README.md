@@ -4,10 +4,45 @@
 
 The package starts with CPU-safe Python scaffolding only. Heavy model dependencies, external repositories, and model weights are intentionally excluded from the initial setup.
 
+## Priorities
+
+Project A is first: AutoGaze outputs become LLaVA-OV2 codec-compatible 112-anchor block selections for answer-level scoring and later `lmms-eval`.
+
+Project B is second: AutoGaze outputs become OneVision-Encoder direct sparse patch tokens for feature-level analysis.
+
+## Bridge-Core Tests
+
+From the VTC repository root:
+
+```bash
+bash scripts/bootstrap_bridge_core.sh
+```
+
+On a non-Linux development machine, this is a best-effort probe and requires:
+
+```bash
+ALLOW_NON_LINUX=1 bash scripts/bootstrap_bridge_core.sh
+```
+
+The bootstrap uses `uv sync` and `uv run`; it does not call `pip`, create a virtualenv manually, install model dependencies, clone repositories, download weights, or run real model inference.
+
+## Environment Isolation
+
+Model-specific dependencies are isolated under `envs/*`.
+
+- `envs/bridge-core` is for pure Python bridge code, synthetic tests, and profiling schema work.
+- `envs/autogaze` will be for actual AutoGaze output generation.
+- `envs/ov-encoder` will be for OneVision-Encoder direct forward probes.
+- `envs/llava-ov2` will be for LLaVA-OV2 processor/backend/generation work.
+- `envs/lmms-eval` will be for benchmark execution.
+- `envs/mps-probe` is optional and best-effort only.
+
+Profiling is part of every smoke and integration stage. Synthetic smoke scripts should produce `stats.json`; real model scripts should later produce `profile.json` or `profile.jsonl`.
+
 ## Initial Constraints
 
 - Python `>=3.11`.
 - Managed with `uv`.
-- Runtime dependencies are limited to `numpy` and `pillow`.
-- Test dependency is limited to `pytest`.
+- Runtime dependencies are limited to `numpy>=1.24` and `pillow>=10.0`.
+- Test dependency is limited to `pytest>=8.0`.
 - Do not add `torch`, `transformers`, AutoGaze, OneVision-Encoder, LLaVA-OV2, `lmms-eval`, or `flash_attn` yet.
