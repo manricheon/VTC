@@ -17,6 +17,8 @@ import tracemalloc
 from datetime import datetime, timezone
 from pathlib import Path
 
+from probe_common import hf_cache_status, source_path_status, weight_path_status
+
 
 ENV_NAME = "ov_encoder"
 
@@ -132,10 +134,14 @@ def profiling_capability() -> dict:
 
 def source_findings(root: Path) -> dict:
     source_root = root / "external" / "LLaVA-OneVision-2" / "transformers_impl" / "onevision_encoder"
+    hf_source_root = root / "external" / "OneVision-Encoder"
     files = {
         "modeling": source_root / "modeling_onevision_encoder.py",
         "configuration": source_root / "configuration_onevision_encoder.py",
         "processing": source_root / "processing_onevision_encoder.py",
+        "hf_modeling": hf_source_root / "modeling_onevision_encoder.py",
+        "hf_configuration": hf_source_root / "configuration_onevision_encoder.py",
+        "hf_readme": hf_source_root / "README.md",
     }
     terms = [
         "flash_attn",
@@ -161,6 +167,8 @@ def source_findings(root: Path) -> dict:
     return {
         "source_root": str(source_root),
         "source_root_exists": source_root.exists(),
+        "hf_source_root": str(hf_source_root),
+        "hf_source_root_exists": hf_source_root.exists(),
         "files": findings,
         "classification": {
             "patch_positions_path_found": any(item["terms"].get("patch_positions", False) for item in findings.values()),
@@ -176,7 +184,7 @@ def write_outputs(root: Path, result: dict) -> dict:
     profile_dir = root / "artifacts" / "profiles"
     compat_dir.mkdir(parents=True, exist_ok=True)
     profile_dir.mkdir(parents=True, exist_ok=True)
-    compat_path = compat_dir / f"{ENV_NAME}_env.json"
+    compat_path = compat_dir / f"{ENV_NAME}_probe.json"
     profile_path = profile_dir / f"compat_{ENV_NAME}.json"
     profile = {
         "schema_version": "compat-probe-1.0",
@@ -200,8 +208,11 @@ def write_outputs(root: Path, result: dict) -> dict:
 def main() -> int:
     root = repo_root()
     llava_source = root / "external" / "LLaVA-OneVision-2"
+    hf_source = root / "external" / "OneVision-Encoder"
     if llava_source.exists():
         sys.path.insert(0, str(llava_source))
+    if hf_source.exists():
+        sys.path.insert(0, str(hf_source))
     imports = {
         "torch": import_check("torch"),
         "transformers": import_check("transformers"),
@@ -209,6 +220,8 @@ def main() -> int:
             "transformers_impl.onevision_encoder.configuration_onevision_encoder"
         ),
         "modeling_onevision_encoder": import_check("transformers_impl.onevision_encoder.modeling_onevision_encoder"),
+        "hf_configuration_onevision_encoder": import_check("configuration_onevision_encoder"),
+        "hf_modeling_onevision_encoder": import_check("modeling_onevision_encoder"),
     }
     result = {
         "env_name": ENV_NAME,
@@ -229,6 +242,11 @@ def main() -> int:
         },
         "imports": imports,
         "commands": {"ffmpeg": command_check("ffmpeg")},
+        "paths": {
+            "hf_cache": hf_cache_status(root),
+            "sources": source_path_status(root),
+            "weights": weight_path_status(root),
+        },
         "source_audit": source_findings(root),
         "attention_fallback": {
             "supports_sdpa_declared": None,
@@ -257,4 +275,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

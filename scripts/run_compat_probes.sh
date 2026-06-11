@@ -7,6 +7,12 @@ VTC_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 RUN_UV_PROBES="${RUN_UV_PROBES:-0}"
 RUN_OPTIONAL_MPS="${RUN_OPTIONAL_MPS:-0}"
 
+if [[ -f "${VTC_ROOT}/scripts/env_weights.sh" ]]; then
+  # Keep HF cache/checkpoint paths under VTC/weights for every probe.
+  # shellcheck disable=SC1091
+  source "${VTC_ROOT}/scripts/env_weights.sh"
+fi
+
 cat <<EOF
 Compatibility probes are isolated by environment.
 
@@ -28,10 +34,12 @@ run_or_print() {
   fi
 
   printf '[run] %s\n' "${label}"
-  (
+  if ! (
     cd "${VTC_ROOT}/${env_dir}"
     uv run --no-sync python "../../${script_path}"
-  )
+  ); then
+    printf '[failed] %s probe command failed; continuing best-effort.\n' "${label}"
+  fi
 }
 
 run_or_print "envs/autogaze" "scripts/probe_autogaze_env.py" "AutoGaze"

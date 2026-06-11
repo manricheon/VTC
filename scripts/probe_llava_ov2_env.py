@@ -17,6 +17,8 @@ import tracemalloc
 from datetime import datetime, timezone
 from pathlib import Path
 
+from probe_common import hf_cache_status, source_path_status, weight_path_status
+
 
 ENV_NAME = "llava_ov2"
 
@@ -183,7 +185,7 @@ def write_outputs(root: Path, result: dict) -> dict:
     profile_dir = root / "artifacts" / "profiles"
     compat_dir.mkdir(parents=True, exist_ok=True)
     profile_dir.mkdir(parents=True, exist_ok=True)
-    compat_path = compat_dir / f"{ENV_NAME}_env.json"
+    compat_path = compat_dir / f"{ENV_NAME}_probe.json"
     profile_path = profile_dir / f"compat_{ENV_NAME}.json"
     profile = {
         "schema_version": "compat-probe-1.0",
@@ -246,6 +248,11 @@ def main() -> int:
         },
         "imports": imports,
         "commands": {"ffmpeg": command_check("ffmpeg")},
+        "paths": {
+            "hf_cache": hf_cache_status(root),
+            "sources": source_path_status(root),
+            "weights": weight_path_status(root),
+        },
         "source_audit": source_findings(root),
         "attention_fallback": {
             "supports_sdpa_declared": None,
@@ -274,4 +281,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

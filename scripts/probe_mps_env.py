@@ -14,6 +14,8 @@ import tracemalloc
 from datetime import datetime, timezone
 from pathlib import Path
 
+from probe_common import hf_cache_status, source_path_status, weight_path_status
+
 
 ENV_NAME = "mps_probe"
 
@@ -123,7 +125,7 @@ def write_outputs(root: Path, result: dict) -> dict:
     profile_dir = root / "artifacts" / "profiles"
     compat_dir.mkdir(parents=True, exist_ok=True)
     profile_dir.mkdir(parents=True, exist_ok=True)
-    compat_path = compat_dir / f"{ENV_NAME}_env.json"
+    compat_path = compat_dir / f"{ENV_NAME}_probe.json"
     profile_path = profile_dir / f"compat_{ENV_NAME}.json"
     profile = {
         "schema_version": "compat-probe-1.0",
@@ -172,6 +174,11 @@ def main() -> int:
             "numpy": import_check("numpy"),
             "PIL": import_check("PIL"),
         },
+        "paths": {
+            "hf_cache": hf_cache_status(root),
+            "sources": source_path_status(root),
+            "weights": weight_path_status(root),
+        },
         "profiling_capability": profiling_capability(),
         "interpretation": {
             "mps_is_official_target": False,
@@ -191,4 +198,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
