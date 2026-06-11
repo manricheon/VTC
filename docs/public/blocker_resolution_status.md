@@ -1,6 +1,6 @@
 # Blocker Resolution Status
 
-Status date: `2026-06-11T13:12:23Z`
+Status date: `2026-06-11T14:11:43Z`
 
 No push was performed. No model inference was run. `external/`, `weights/`, `artifacts/`, and `projects/gaze-ov-bridge/out/` remain uncommitted.
 
@@ -16,6 +16,7 @@ No push was performed. No model inference was run. `external/`, `weights/`, `art
 | AutoGaze HF repo verification | `resolved` | `nvidia/AutoGaze` is the selected AutoGaze repo; payload exists locally. | Use this repo for future refreshes. |
 | HF token/access | `partially_resolved` | `HF_TOKEN` is not set; current payloads are present in public-only mode. | Authenticate only if future gated/private access is needed. |
 | Weight directories | `resolved` | `check_hf_assets.sh` reports payloads for AutoGaze, OneVision-Encoder, and LLaVA-OV2. | Do not commit `weights/`. |
+| Model env lockfiles dirty tree | `resolved` | `docs/public/model_env_lock_status.md` records valid TOML, clean secret/path scans, matching env metadata, and passing `uv lock --check` for all five model env lockfiles. | Commit model env lockfiles as public reproducibility artifacts; regenerate later on Linux if runtime probes require it. |
 | Linux ffmpeg/system dependency | `needs_ffmpeg` | `check_system_deps.sh` reports `ffmpeg` missing on current host; Linux target unverified. | Install/verify on Linux before codec/backend runtime work. |
 | Model-specific env import probes | `needs_model_env_probe` | no heavy sync; no-sync probes are partial. | Run `VTC_ALLOW_HEAVY_ENV_SYNC=1 bash scripts/setup_model_envs_best_effort.sh`. |
 | AutoGaze runtime env | `needs_model_env_probe` | source and weights present; runtime deps not synced. | Sync/probe isolated `envs/autogaze`. |
