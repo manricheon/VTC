@@ -68,16 +68,32 @@ def _model_args(model: str, fourier_reserve: int, divt_threshold: float) -> str:
     raise ValueError(f"unknown model: {model}")
 
 
+def parse_limit(value: str) -> int | None:
+    if value in {"none", "all", "full"}:
+        return None
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "limit must be a positive integer, none, all, or full"
+        ) from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError(
+            "limit must be a positive integer, none, all, or full"
+        )
+    return parsed
+
+
 def build_matrix(
     *,
     preset: str,
     projector_model: str = "all",
     tasks: str | None = None,
-    limit: int = 1,
+    limit: int | None = 1,
     fourier_reserve: int = 12,
     divt_threshold: float = 0.65,
 ) -> list[dict[str, Any]]:
-    if limit <= 0:
+    if limit is not None and limit <= 0:
         raise ValueError("limit must be positive")
     rows: list[dict[str, Any]] = []
     for model in _selected_models(projector_model):
@@ -86,7 +102,7 @@ def build_matrix(
                 {
                     "model": model,
                     "task": task,
-                    "limit": int(limit),
+                    "limit": int(limit) if limit is not None else None,
                     "model_args": _model_args(model, fourier_reserve, divt_threshold),
                 }
             )
@@ -98,7 +114,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preset", default="smoke", choices=sorted(DEFAULT_PRESETS))
     parser.add_argument("--projector-model", default="all", choices=("all", "fourier", "divt"))
     parser.add_argument("--tasks", default=None)
-    parser.add_argument("--limit", type=int, default=1)
+    parser.add_argument("--limit", type=parse_limit, default=1)
     parser.add_argument("--fourier-reserve", type=int, default=12)
     parser.add_argument("--divt-threshold", type=float, default=0.65)
     return parser.parse_args()

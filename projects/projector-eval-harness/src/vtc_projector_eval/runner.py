@@ -9,15 +9,15 @@ def build_lmms_eval_command(
     model_args: str,
     task: str,
     output_dir: str,
-    limit: int,
+    limit: int | None,
     include_path: str,
     nproc: int,
     port: int,
     batch_size: int = 1,
 ) -> list[str]:
-    if limit <= 0:
+    if limit is not None and limit <= 0:
         raise ValueError("limit must be positive")
-    return [
+    command = [
         "uv",
         "run",
         "accelerate",
@@ -36,11 +36,16 @@ def build_lmms_eval_command(
         task,
         "--batch_size",
         str(batch_size),
-        "--limit",
-        str(limit),
-        "--include_path",
-        include_path,
-        "--log_samples",
-        "--output_path",
-        output_dir,
     ]
+    if limit is not None:
+        command.extend(["--limit", str(limit)])
+    command.extend(
+        [
+            "--include_path",
+            include_path,
+            "--log_samples",
+            "--output_path",
+            output_dir,
+        ]
+    )
+    return command

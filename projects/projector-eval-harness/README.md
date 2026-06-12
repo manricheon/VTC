@@ -11,3 +11,9 @@ The v1 scope is source audit, dry-run runners, profile summaries, and
 
 The package does not download weights, datasets, or modify upstream source
 repositories.
+
+See:
+
+- `docs/public/projector_eval_harness.md`
+- `docs/public/projector_eval_benchmark_guide.md`
+- `docs/public/projector_eval_report_template.md`

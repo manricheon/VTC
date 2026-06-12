@@ -27,6 +27,27 @@ def test_build_matrix_accepts_task_override_and_divt_threshold():
     assert "divt_threshold=0.75" in rows[0]["model_args"]
 
 
+def test_build_matrix_accepts_no_limit_for_full_runs():
+    rows = build_matrix(
+        preset="full",
+        projector_model="fourier",
+        tasks="mme",
+        limit=None,
+    )
+
+    assert rows == [
+        {
+            "model": "vtc_fourier_llava15",
+            "task": "mme",
+            "limit": None,
+            "model_args": (
+                "pretrained=${FOURIER_CKPT},device_map=auto,"
+                "use_flash_attention_2=False,fourier_reserve=12"
+            ),
+        }
+    ]
+
+
 def test_build_matrix_rejects_unknown_projector_model():
     try:
         build_matrix(preset="smoke", projector_model="unknown")

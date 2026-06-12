@@ -40,10 +40,23 @@ Dry-run the default limit-one MME commands:
 bash scripts/run_projector_eval_limit1.sh
 ```
 
+Detailed Linux/CUDA benchmark workflow and reporting docs:
+
+- [Projector Eval Benchmark Guide](projector_eval_benchmark_guide.md)
+- [Projector Eval Report Template](projector_eval_report_template.md)
+- [Current Projector Eval Report](projector_eval_current_report.md)
+
 Run after Linux/CUDA, env sync, checkpoints, and datasets are ready:
 
 ```bash
 RUN_PROJECTOR_EVAL=1 PROJECTOR_MODEL=all TASK=mme LIMIT=1 \
+  bash scripts/run_projector_eval_limit1.sh
+```
+
+For full task execution, set `LIMIT=none` to omit `lmms-eval --limit`:
+
+```bash
+RUN_PROJECTOR_EVAL=1 PROJECTOR_MODEL=all TASK=mme LIMIT=none \
   bash scripts/run_projector_eval_limit1.sh
 ```
 
@@ -57,7 +70,7 @@ Useful overrides:
 
 - `PROJECTOR_MODEL=all|fourier|divt`
 - `TASK=mme`
-- `LIMIT=1`
+- `LIMIT=1|none`
 - `FOURIER_CKPT=weights/checkpoints/llava-v1.5-7b`
 - `DIVT_CKPT=weights/checkpoints/llava-v1.5-divt-0.65-7b`
 - `FOURIER_RESERVE=12`
@@ -77,6 +90,23 @@ Generate a JSON matrix:
 cd envs/bridge-core
 PYTHONPATH=../../projects/projector-eval-harness/src \
   uv run python -m vtc_projector_eval.matrix --preset smoke --projector-model all --limit 1
+```
+
+Summarize profiles:
+
+```bash
+bash scripts/summarize_projector_eval_profiles.sh artifacts/profiles/projector_eval_<run_id>.jsonl
+```
+
+Write a Markdown report:
+
+```bash
+bash scripts/write_projector_eval_report.sh \
+  --run-id <run_id> \
+  --preset smoke \
+  --limit 1 \
+  --output-md docs/public/projector_eval_current_report.md \
+  artifacts/profiles/projector_eval_<run_id>.jsonl
 ```
 
 ## Runtime Blockers

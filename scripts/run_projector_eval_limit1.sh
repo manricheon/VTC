@@ -13,7 +13,6 @@ INCLUDE_PATH="${VTC_ROOT}/projects/projector-eval-harness/tasks"
 PROJECTOR_MODEL="${PROJECTOR_MODEL:-all}"
 TASK="${TASK:-mme}"
 LIMIT="${LIMIT:-1}"
-RUN_ID="${RUN_ID:-limit${LIMIT}_${TASK}}"
 NPROC="${NPROC:-1}"
 PORT="${PORT:-29840}"
 DEVICE_MAP="${DEVICE_MAP:-auto}"
@@ -23,6 +22,26 @@ FOURIER_CKPT="${FOURIER_CKPT:-${VTC_ROOT}/weights/checkpoints/llava-v1.5-7b}"
 DIVT_CKPT="${DIVT_CKPT:-${VTC_ROOT}/weights/checkpoints/llava-v1.5-divt-0.65-7b}"
 
 export UV_CACHE_DIR="${UV_CACHE_DIR:-${TMPDIR:-/tmp}/vtc-uv-cache}"
+
+LIMIT_ARGS=()
+case "${LIMIT}" in
+  none|all|full)
+    LIMIT_LABEL="full"
+    ;;
+  ''|*[!0-9]*)
+    echo "LIMIT must be a positive integer, none, all, or full" >&2
+    exit 2
+    ;;
+  *)
+    if (( LIMIT <= 0 )); then
+      echo "LIMIT must be a positive integer, none, all, or full" >&2
+      exit 2
+    fi
+    LIMIT_ARGS=("--limit" "${LIMIT}")
+    LIMIT_LABEL="limit${LIMIT}"
+    ;;
+esac
+RUN_ID="${RUN_ID:-${LIMIT_LABEL}_${TASK}}"
 
 models=()
 case "${PROJECTOR_MODEL}" in
@@ -50,11 +69,15 @@ print_command() {
   echo "env_dir=${env_dir}"
   echo "model=${model_name}"
   echo "task=${TASK}"
-  echo "limit=${LIMIT}"
+  echo "limit=${LIMIT_LABEL}"
   echo "out_dir=${out_dir}"
   echo "planned command:"
   echo "cd ${env_dir}"
-  echo "LMMS_EVAL_PLUGINS=vtc_projector_eval PYTHONPATH=${PROJECT_SRC}:${LMMS_ROOT}:\${PYTHONPATH:-} uv run accelerate launch --num_processes=${NPROC} --main_process_port=${PORT} -m lmms_eval --model ${model_name} --model_args '${model_args}' --tasks ${TASK} --batch_size 1 --limit ${LIMIT} --include_path '${INCLUDE_PATH}' --log_samples --output_path '${out_dir}/'"
+  local limit_fragment=""
+  if (( ${#LIMIT_ARGS[@]} > 0 )); then
+    limit_fragment=" ${LIMIT_ARGS[*]}"
+  fi
+  echo "LMMS_EVAL_PLUGINS=vtc_projector_eval PYTHONPATH=${PROJECT_SRC}:${LMMS_ROOT}:\${PYTHONPATH:-} uv run accelerate launch --num_processes=${NPROC} --main_process_port=${PORT} -m lmms_eval --model ${model_name} --model_args '${model_args}' --tasks ${TASK} --batch_size 1${limit_fragment} --include_path '${INCLUDE_PATH}' --log_samples --output_path '${out_dir}/'"
 }
 
 run_one() {
@@ -96,7 +119,7 @@ run_one() {
     --model_args "${model_args}" \
     --tasks "${TASK}" \
     --batch_size 1 \
-    --limit "${LIMIT}" \
+    "${LIMIT_ARGS[@]}" \
     --include_path "${INCLUDE_PATH}" \
     --log_samples \
     --output_path "${out_dir}/" \
