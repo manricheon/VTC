@@ -15,11 +15,13 @@ Required local inputs:
 - `external/lmms-eval`
 - `external/Fourier-Compressor`
 - `external/DiVT`
-- Fourier-compatible LLaVA-1.5 checkpoint under `weights/checkpoints/llava-v1.5-7b`
-- DiVT-compatible checkpoint under `weights/checkpoints/llava-v1.5-divt-0.65-7b`
+- Fourier checkpoint under `weights/checkpoints/Fourier-LLaVA-v1.5-7B-144`
+- DiVT checkpoint under `weights/checkpoints/llava-v1.5-7b-divt-0.65`
 - Dataset access/cache for the selected `lmms-eval` tasks
 
 The harness never downloads weights or datasets by default.
+See [Projector Eval Assets](projector_eval_assets.md) for the HF repo to local
+path mapping.
 
 ## One-Time Checks
 
@@ -104,8 +106,8 @@ done
 Useful overrides:
 
 - `PROJECTOR_MODEL=fourier|divt|all`
-- `FOURIER_CKPT=/abs/path/to/llava-v1.5-7b`
-- `DIVT_CKPT=/abs/path/to/llava-v1.5-divt-0.65-7b`
+- `FOURIER_CKPT=/abs/path/to/Fourier-LLaVA-v1.5-7B-144`
+- `DIVT_CKPT=/abs/path/to/llava-v1.5-7b-divt-0.65`
 - `DEVICE_MAP=auto`
 - `NPROC=1`
 - `PORT=29840`

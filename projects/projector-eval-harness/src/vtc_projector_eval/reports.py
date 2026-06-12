@@ -7,14 +7,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .assets import PROJECTOR_ASSETS, asset_by_key
 from .matrix import DEFAULT_PRESETS, build_matrix, parse_limit
 from .profiles import summarize_profiles
 from .results import collect_result_rows, summarize_result_rows
 from .sources import audit_sources
 
 
-DEFAULT_FOURIER_CKPT = Path("weights/checkpoints/llava-v1.5-7b")
-DEFAULT_DIVT_CKPT = Path("weights/checkpoints/llava-v1.5-divt-0.65-7b")
+DEFAULT_FOURIER_CKPT = asset_by_key("fourier")["local_path"]
+DEFAULT_DIVT_CKPT = asset_by_key("divt")["local_path"]
 
 
 def _utc_now() -> str:
@@ -42,13 +43,19 @@ def checkpoint_blockers(
     root = Path(repo_root)
     blockers: list[str] = []
     checks = (
-        ("Fourier/LLaVA-1.5", Path(fourier_ckpt)),
-        ("DiVT", Path(divt_ckpt)),
+        (asset_by_key("fourier"), Path(fourier_ckpt)),
+        (asset_by_key("divt"), Path(divt_ckpt)),
     )
-    for label, relative_path in checks:
+    for asset, relative_path in checks:
         path = relative_path if relative_path.is_absolute() else root / relative_path
         if not path.exists():
-            blockers.append(f"missing checkpoint for {label}: {relative_path}")
+            blockers.append(
+                "missing checkpoint for {label} ({repo}): {path}".format(
+                    label=asset["label"],
+                    repo=asset["hf_repo"],
+                    path=relative_path,
+                )
+            )
     return blockers
 
 
@@ -89,6 +96,25 @@ def _matrix_table(rows: list[dict[str, Any]]) -> list[str]:
                 task=row["task"],
                 limit="none" if row["limit"] is None else row["limit"],
                 model_args=row["model_args"],
+            )
+        )
+    return lines
+
+
+def _asset_table() -> list[str]:
+    lines = [
+        "| Projector | HF repo | Local path | Base | Visual tokens | Runtime knob |",
+        "| --- | --- | --- | --- | ---: | --- |",
+    ]
+    for asset in PROJECTOR_ASSETS:
+        lines.append(
+            "| {label} | `{repo}` | `{path}` | {base} | {tokens} | `{knob}` |".format(
+                label=asset["label"],
+                repo=asset["hf_repo"],
+                path=asset["local_path"],
+                base=asset["base_model"],
+                tokens=asset["visual_tokens"],
+                knob=asset["runtime_knob"],
             )
         )
     return lines
@@ -207,6 +233,10 @@ def build_report(
             "## Source Snapshots",
             "",
             *_source_table(source_records),
+            "",
+            "## Checkpoint Assets",
+            "",
+            *_asset_table(),
             "",
             "## Benchmark Matrix",
             "",

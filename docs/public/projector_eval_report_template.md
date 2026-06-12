@@ -36,8 +36,8 @@ Use this template for a completed smoke or full projector benchmark run.
 
 | Model | Checkpoint path | Base model | Checksum or revision | Notes |
 | --- | --- | --- | --- | --- |
-| Fourier/LLaVA-1.5 |  |  |  |  |
-| DiVT |  |  |  |  |
+| Fourier-LLaVA-v1.5-7B-144 | `weights/checkpoints/Fourier-LLaVA-v1.5-7B-144` | LLaVA-v1.5-7B |  | `whyisverysmart/Fourier-LLaVA-v1.5-7B-144` |
+| DiVT0.65 | `weights/checkpoints/llava-v1.5-7b-divt-0.65` | LLaVA-v1.5-7B |  | `hyunlee86/llava-v1.5-7b-divt-0.65` |
 
 ## Benchmark Matrix
 

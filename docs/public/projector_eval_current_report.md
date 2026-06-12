@@ -1,7 +1,7 @@
 # Projector Eval Benchmark Report
 
 - run_id: `current`
-- created_at_utc: `2026-06-12T11:18:57Z`
+- created_at_utc: `2026-06-12T11:40:09Z`
 - preset: `smoke`
 - tasks: `mme,pope,textvqa_val_lite,vqav2_val_lite,scienceqa_img,mmbench_en_dev_lite,gqa_lite`
 - limit: `1`
@@ -12,8 +12,8 @@
 
 Benchmark execution is blocked for real runs.
 
-- missing checkpoint for Fourier/LLaVA-1.5: weights/checkpoints/llava-v1.5-7b
-- missing checkpoint for DiVT: weights/checkpoints/llava-v1.5-divt-0.65-7b
+- missing checkpoint for Fourier-LLaVA-v1.5-7B-144 (whyisverysmart/Fourier-LLaVA-v1.5-7B-144): weights/checkpoints/Fourier-LLaVA-v1.5-7B-144
+- missing checkpoint for DiVT0.65 (hyunlee86/llava-v1.5-7b-divt-0.65): weights/checkpoints/llava-v1.5-7b-divt-0.65
 
 ## Source Snapshots
 
@@ -21,6 +21,13 @@ Benchmark execution is blocked for real runs.
 | --- | --- | --- | --- | --- | --- |
 | Fourier-Compressor | ok | master | `b846f44c5c18` | ok | ok |
 | DiVT | ok | main | `5ebbb162d580` | ok | ok |
+
+## Checkpoint Assets
+
+| Projector | HF repo | Local path | Base | Visual tokens | Runtime knob |
+| --- | --- | --- | --- | ---: | --- |
+| Fourier-LLaVA-v1.5-7B-144 | `whyisverysmart/Fourier-LLaVA-v1.5-7B-144` | `weights/checkpoints/Fourier-LLaVA-v1.5-7B-144` | LLaVA-v1.5-7B | 144 | `FOURIER_RESERVE=12` |
+| DiVT0.65 | `hyunlee86/llava-v1.5-7b-divt-0.65` | `weights/checkpoints/llava-v1.5-7b-divt-0.65` | LLaVA-v1.5-7B | 74.1 | `DIVT_THRESHOLD=0.65` |
 
 ## Benchmark Matrix
 

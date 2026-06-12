@@ -14,6 +14,7 @@ repositories.
 
 See:
 
+- `docs/public/projector_eval_assets.md`
 - `docs/public/projector_eval_harness.md`
 - `docs/public/projector_eval_benchmark_guide.md`
 - `docs/public/projector_eval_report_template.md`

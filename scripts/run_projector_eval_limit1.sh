@@ -18,8 +18,10 @@ PORT="${PORT:-29840}"
 DEVICE_MAP="${DEVICE_MAP:-auto}"
 FOURIER_RESERVE="${FOURIER_RESERVE:-12}"
 DIVT_THRESHOLD="${DIVT_THRESHOLD:-0.65}"
-FOURIER_CKPT="${FOURIER_CKPT:-${VTC_ROOT}/weights/checkpoints/llava-v1.5-7b}"
-DIVT_CKPT="${DIVT_CKPT:-${VTC_ROOT}/weights/checkpoints/llava-v1.5-divt-0.65-7b}"
+FOURIER_HF_REPO="${FOURIER_HF_REPO:-whyisverysmart/Fourier-LLaVA-v1.5-7B-144}"
+DIVT_HF_REPO="${DIVT_HF_REPO:-hyunlee86/llava-v1.5-7b-divt-0.65}"
+FOURIER_CKPT="${FOURIER_CKPT:-${VTC_ROOT}/weights/checkpoints/Fourier-LLaVA-v1.5-7B-144}"
+DIVT_CKPT="${DIVT_CKPT:-${VTC_ROOT}/weights/checkpoints/llava-v1.5-7b-divt-0.65}"
 
 export UV_CACHE_DIR="${UV_CACHE_DIR:-${TMPDIR:-/tmp}/vtc-uv-cache}"
 
@@ -147,7 +149,7 @@ for model in "${models[@]}"; do
       blockers+=("missing external/Fourier-Compressor")
     fi
     if [[ ! -d "${FOURIER_CKPT}" ]]; then
-      blockers+=("missing Fourier/LLaVA-1.5 checkpoint directory: ${FOURIER_CKPT}")
+      blockers+=("missing Fourier checkpoint directory: ${FOURIER_CKPT} (${FOURIER_HF_REPO})")
     fi
     run_one \
       "fourier" \
@@ -162,7 +164,7 @@ for model in "${models[@]}"; do
       blockers+=("missing external/DiVT")
     fi
     if [[ ! -d "${DIVT_CKPT}" ]]; then
-      blockers+=("missing DiVT checkpoint directory: ${DIVT_CKPT}")
+      blockers+=("missing DiVT checkpoint directory: ${DIVT_CKPT} (${DIVT_HF_REPO})")
     fi
     run_one \
       "divt" \

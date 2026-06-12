@@ -35,8 +35,10 @@ def _make_minimal_sources(repo_root: Path) -> None:
 def test_checkpoint_blockers_report_missing_default_checkpoints(tmp_path: Path):
     blockers = checkpoint_blockers(tmp_path)
 
-    assert any("weights/checkpoints/llava-v1.5-7b" in blocker for blocker in blockers)
-    assert any("weights/checkpoints/llava-v1.5-divt-0.65-7b" in blocker for blocker in blockers)
+    assert any("whyisverysmart/Fourier-LLaVA-v1.5-7B-144" in blocker for blocker in blockers)
+    assert any("weights/checkpoints/Fourier-LLaVA-v1.5-7B-144" in blocker for blocker in blockers)
+    assert any("hyunlee86/llava-v1.5-7b-divt-0.65" in blocker for blocker in blockers)
+    assert any("weights/checkpoints/llava-v1.5-7b-divt-0.65" in blocker for blocker in blockers)
 
 
 def test_build_report_includes_sources_matrix_profiles_and_blockers(tmp_path: Path):
@@ -68,6 +70,8 @@ def test_build_report_includes_sources_matrix_profiles_and_blockers(tmp_path: Pa
     assert "run_id: `unit`" in report
     assert "Fourier-Compressor" in report
     assert "DiVT" in report
+    assert "whyisverysmart/Fourier-LLaVA-v1.5-7B-144" in report
+    assert "hyunlee86/llava-v1.5-7b-divt-0.65" in report
     assert "vtc_fourier_llava15" in report
     assert "vtc_divt_llava15" in report
     assert "vtc_fourier_llava15::mme" in report

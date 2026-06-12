@@ -42,6 +42,7 @@ bash scripts/run_projector_eval_limit1.sh
 
 Detailed Linux/CUDA benchmark workflow and reporting docs:
 
+- [Projector Eval Assets](projector_eval_assets.md)
 - [Projector Eval Benchmark Guide](projector_eval_benchmark_guide.md)
 - [Projector Eval Report Template](projector_eval_report_template.md)
 - [Current Projector Eval Report](projector_eval_current_report.md)
@@ -71,8 +72,8 @@ Useful overrides:
 - `PROJECTOR_MODEL=all|fourier|divt`
 - `TASK=mme`
 - `LIMIT=1|none`
-- `FOURIER_CKPT=weights/checkpoints/llava-v1.5-7b`
-- `DIVT_CKPT=weights/checkpoints/llava-v1.5-divt-0.65-7b`
+- `FOURIER_CKPT=weights/checkpoints/Fourier-LLaVA-v1.5-7B-144`
+- `DIVT_CKPT=weights/checkpoints/llava-v1.5-7b-divt-0.65`
 - `FOURIER_RESERVE=12`
 - `DIVT_THRESHOLD=0.65`
 - `RUN_ID=limit1_mme`
