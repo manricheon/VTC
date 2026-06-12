@@ -5,11 +5,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VTC_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+export UV_CACHE_DIR="${UV_CACHE_DIR:-${TMPDIR:-/tmp}/vtc-uv-cache}"
+mkdir -p "${UV_CACHE_DIR}"
+
 profiles=(
   "projects/gaze-ov-bridge/out/smoke_project_a_codec_synthetic/profile.json"
   "projects/gaze-ov-bridge/out/smoke_project_a_llava_boundary/profile.json"
   "projects/gaze-ov-bridge/out/smoke_project_b_ov_direct_synthetic/profile.json"
   "projects/gaze-ov-bridge/out/smoke_project_b_ov_boundary/profile.json"
+  "projects/projector-eval-harness/out/smoke_projector_eval_synthetic/profile.json"
 )
 
 existing=()

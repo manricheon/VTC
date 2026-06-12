@@ -21,6 +21,7 @@ cd "${VTC_ROOT}/envs/bridge-core"
 
 uv sync --group dev
 uv run python -m compileall ../../projects/gaze-ov-bridge/src
+uv run python -m compileall ../../projects/projector-eval-harness/src
 pytest_status=0
 uv run pytest -q ../../projects/gaze-ov-bridge/tests || pytest_status=$?
 if [[ "${pytest_status}" -eq 5 ]]; then
@@ -28,3 +29,4 @@ if [[ "${pytest_status}" -eq 5 ]]; then
 elif [[ "${pytest_status}" -ne 0 ]]; then
     exit "${pytest_status}"
 fi
+uv run pytest -q ../../projects/projector-eval-harness/tests

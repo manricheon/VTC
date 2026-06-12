@@ -34,6 +34,18 @@ bash scripts/audit_projector_sources.sh
 
 ## Runners
 
+Run all currently safe projector examples:
+
+```bash
+bash scripts/run_projector_eval_examples.sh
+```
+
+This writes:
+
+```text
+projects/projector-eval-harness/out/smoke_projector_eval_synthetic/
+```
+
 Dry-run the default limit-one MME commands:
 
 ```bash

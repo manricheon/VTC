@@ -33,6 +33,12 @@ if [[ -f ../../projects/gaze-ov-bridge/scripts/smoke_project_b_ov_boundary.py ]]
   uv run python ../../projects/gaze-ov-bridge/scripts/smoke_project_b_ov_boundary.py
 fi
 
+if [[ -f ../../projects/projector-eval-harness/scripts/smoke_projector_eval_synthetic.py ]]; then
+  echo
+  echo "Running projector eval synthetic smoke"
+  uv run python ../../projects/projector-eval-harness/scripts/smoke_projector_eval_synthetic.py
+fi
+
 cd "${VTC_ROOT}"
 
 echo
@@ -41,5 +47,6 @@ echo "- projects/gaze-ov-bridge/out/smoke_project_a_codec_synthetic/"
 echo "- projects/gaze-ov-bridge/out/smoke_project_a_llava_boundary/"
 echo "- projects/gaze-ov-bridge/out/smoke_project_b_ov_direct_synthetic/"
 echo "- projects/gaze-ov-bridge/out/smoke_project_b_ov_boundary/"
+echo "- projects/projector-eval-harness/out/smoke_projector_eval_synthetic/"
 echo
 echo "No model inference was run."

@@ -47,6 +47,12 @@ vendor LLaVA automatically.
 
 ## Dry-Run
 
+Run all safe projector examples first:
+
+```bash
+bash scripts/run_projector_eval_examples.sh
+```
+
 Print the planned default limit-one MME commands:
 
 ```bash

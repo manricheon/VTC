@@ -31,4 +31,6 @@ fi
 cd "${VTC_ROOT}/envs/bridge-core"
 uv sync --group dev
 uv run python -m compileall ../../projects/gaze-ov-bridge/src
+uv run python -m compileall ../../projects/projector-eval-harness/src
 uv run pytest -q ../../projects/gaze-ov-bridge/tests
+uv run pytest -q ../../projects/projector-eval-harness/tests
