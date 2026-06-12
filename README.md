@@ -5,6 +5,8 @@ VTC is a Linux-target, uv-managed multi-project workspace for video token compre
 The first subproject is `projects/gaze-ov-bridge`, which restarts the AutoGaze, OneVision-Encoder, and LLaVA-OV2 work from a clean, staged foundation.
 
 Start with the bridge-core environment guide: [docs/public/environment.md](docs/public/environment.md).
+For a fresh Linux/CUDA machine where `external/` and `weights/` are missing,
+follow [docs/public/cuda_machine_setup.md](docs/public/cuda_machine_setup.md).
 
 ## Repository Layout
 
@@ -57,6 +59,10 @@ bash scripts/run_profile_summaries.sh
 ```
 
 For details, see [docs/public/quickstart.md](docs/public/quickstart.md).
+
+For runtime preparation on a CUDA/Linux machine, including external source
+clones, code-only snapshots, weights, model env probes, and benchmark gates, see
+[docs/public/cuda_machine_setup.md](docs/public/cuda_machine_setup.md).
 
 ## What Works Today
 

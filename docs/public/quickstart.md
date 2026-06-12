@@ -4,6 +4,9 @@ This quickstart runs the current boundary-ready bridge-core workflow. It does
 not run real model inference, LLaVA-OV2 generation, OV-Encoder forward, or full
 lmms-eval.
 
+If this is a fresh Linux/CUDA machine and `external/` or `weights/` are empty,
+use `docs/public/cuda_machine_setup.md` after this bridge-core quickstart.
+
 ## 1. Install uv
 
 From the VTC repository root:
@@ -76,3 +79,15 @@ bash scripts/run_profile_summaries.sh
 - Real OV-Encoder forward.
 - Full lmms-eval benchmark execution.
 - CUDA or FlashAttention runtime.
+
+## Next For CUDA/Linux Runtime Setup
+
+Follow:
+
+```text
+docs/public/cuda_machine_setup.md
+```
+
+That guide covers external source clones, Hugging Face code-only snapshots,
+weight downloads, model env sync/import probes, CUDA checks, and the first
+guarded lmms-eval `--limit 1` path.

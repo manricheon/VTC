@@ -9,11 +9,12 @@ runtime probes.
 1. `README.md`
 2. `docs/public/current_status.md`
 3. `docs/public/quickstart.md`
-4. `docs/public/architecture.md`
-5. `docs/public/profiling.md`
-6. `docs/public/usage_project_a.md`
-7. `docs/public/usage_project_b.md`
-8. `docs/public/benchmarking.md` if benchmark work is in scope
+4. `docs/public/cuda_machine_setup.md` if working on Linux/CUDA runtime setup
+5. `docs/public/architecture.md`
+6. `docs/public/profiling.md`
+7. `docs/public/usage_project_a.md`
+8. `docs/public/usage_project_b.md`
+9. `docs/public/benchmarking.md` if benchmark work is in scope
 
 For local-only behavior, also read `AGENTS.md` when available in the working
 copy.
