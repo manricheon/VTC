@@ -1,11 +1,12 @@
 # Projector Eval Benchmark Report
 
 - run_id: `current`
-- created_at_utc: `2026-06-12T10:59:24Z`
+- created_at_utc: `2026-06-12T11:18:57Z`
 - preset: `smoke`
 - tasks: `mme,pope,textvqa_val_lite,vqav2_val_lite,scienceqa_img,mmbench_en_dev_lite,gqa_lite`
 - limit: `1`
 - profiles: `-`
+- results: `-`
 
 ## Status
 
@@ -42,7 +43,15 @@ Benchmark execution is blocked for real runs.
 
 ## Result Summary
 
+No lmms-eval result rows were found.
+
+## Runtime Profile Summary
+
 No profile rows were found.
+
+## Result Files
+
+No result files were found.
 
 ## Run Commands
 
@@ -73,6 +82,7 @@ bash scripts/write_projector_eval_report.sh \
   --run-id current \
   --preset smoke \
   --limit 1 \
+  --result artifacts/profiles/projector_eval_<run_id>_<projector>_<task> \
   --output-md docs/public/projector_eval_current_report.md \
   artifacts/profiles/projector_eval_<run_id>.jsonl
 ```

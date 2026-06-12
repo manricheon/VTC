@@ -9,6 +9,7 @@ from typing import Any
 
 from .matrix import DEFAULT_PRESETS, build_matrix, parse_limit
 from .profiles import summarize_profiles
+from .results import collect_result_rows, summarize_result_rows
 from .sources import audit_sources
 
 
@@ -115,10 +116,45 @@ def _profile_table(summary: dict[str, dict[str, Any]]) -> list[str]:
     return lines
 
 
+def _result_table(summary: list[dict[str, Any]]) -> list[str]:
+    if not summary:
+        return ["No lmms-eval result rows were found."]
+    lines = [
+        "| Task | Metric | Fourier score | DiVT score | DiVT - Fourier |",
+        "| --- | --- | ---: | ---: | ---: |",
+    ]
+    for row in summary:
+        lines.append(
+            "| `{task}` | `{metric}` | {fourier} | {divt} | {delta} |".format(
+                task=row["task"],
+                metric=row["metric"],
+                fourier=_format(row["fourier_score"]),
+                divt=_format(row["divt_score"]),
+                delta=_format(row["delta_divt_minus_fourier"]),
+            )
+        )
+    return lines
+
+
+def _result_file_list(summary: list[dict[str, Any]]) -> list[str]:
+    paths = sorted(
+        {
+            str(path)
+            for row in summary
+            for path in (row["fourier_path"], row["divt_path"])
+            if path
+        }
+    )
+    if not paths:
+        return ["No result files were found."]
+    return [f"- {path}" for path in paths]
+
+
 def build_report(
     *,
     repo_root: str | Path,
     profiles: list[str | Path],
+    result_paths: list[str | Path] | None = None,
     run_id: str,
     preset: str = "smoke",
     tasks: str | None = None,
@@ -135,6 +171,8 @@ def build_report(
     )
     rows = build_matrix(preset=preset, projector_model="all", tasks=tasks, limit=limit)
     profile_summary = summarize_profiles(profiles)
+    result_rows = collect_result_rows(result_paths or [])
+    result_summary = summarize_result_rows(result_rows)
     task_label = tasks or ",".join(DEFAULT_PRESETS[preset])
     limit_label = "none" if limit is None else str(limit)
 
@@ -147,6 +185,7 @@ def build_report(
         f"- tasks: `{task_label}`",
         f"- limit: `{limit_label}`",
         f"- profiles: `{', '.join(str(path) for path in profiles) if profiles else '-'}`",
+        f"- results: `{', '.join(str(path) for path in result_paths or []) if result_paths else '-'}`",
         "",
         "## Status",
         "",
@@ -175,7 +214,15 @@ def build_report(
             "",
             "## Result Summary",
             "",
+            *_result_table(result_summary),
+            "",
+            "## Runtime Profile Summary",
+            "",
             *_profile_table(profile_summary),
+            "",
+            "## Result Files",
+            "",
+            *_result_file_list(result_summary),
             "",
             "## Run Commands",
             "",
@@ -206,6 +253,7 @@ def build_report(
             f"  --run-id {run_id} \\",
             f"  --preset {preset} \\",
             f"  --limit {limit_label} \\",
+            "  --result artifacts/profiles/projector_eval_<run_id>_<projector>_<task> \\",
             "  --output-md docs/public/projector_eval_current_report.md \\",
             "  artifacts/profiles/projector_eval_<run_id>.jsonl",
             "```",
@@ -233,6 +281,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preset", default="smoke", choices=sorted(DEFAULT_PRESETS))
     parser.add_argument("--tasks", default=None)
     parser.add_argument("--limit", type=parse_limit, default=1)
+    parser.add_argument("--result", dest="result_paths", action="append", default=[], type=Path)
     parser.add_argument("--output-md", type=Path, default=None)
     parser.add_argument("--fourier-ckpt", default=str(DEFAULT_FOURIER_CKPT))
     parser.add_argument("--divt-ckpt", default=str(DEFAULT_DIVT_CKPT))
@@ -245,6 +294,7 @@ def main() -> None:
     report = build_report(
         repo_root=args.repo_root,
         profiles=args.profiles,
+        result_paths=args.result_paths,
         run_id=args.run_id,
         preset=args.preset,
         tasks=args.tasks,

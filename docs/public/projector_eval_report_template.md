@@ -89,9 +89,13 @@ bash scripts/write_projector_eval_report.sh \
   --run-id <run_id> \
   --preset <smoke|full> \
   --limit <limit|none> \
+  --result artifacts/profiles/projector_eval_<run_id>_<projector>_<task> \
   --output-md docs/public/projector_eval_current_report.md \
   artifacts/profiles/projector_eval_<run_id>.jsonl
 ```
+
+`--result` points to `lmms-eval` output directories or `*_results.json` files.
+The positional JSONL files provide runtime profile summaries.
 
 ## Interpretation
 

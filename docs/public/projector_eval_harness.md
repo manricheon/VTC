@@ -105,6 +105,7 @@ bash scripts/write_projector_eval_report.sh \
   --run-id <run_id> \
   --preset smoke \
   --limit 1 \
+  --result artifacts/profiles/projector_eval_<run_id>_<projector>_<task> \
   --output-md docs/public/projector_eval_current_report.md \
   artifacts/profiles/projector_eval_<run_id>.jsonl
 ```

@@ -90,6 +90,34 @@ def test_build_report_marks_none_limit_for_full_runs(tmp_path: Path):
     assert "| `vtc_divt_llava15` | `mme` | none |" in report
 
 
+def test_build_report_includes_lmms_eval_result_scores(tmp_path: Path):
+    _make_minimal_sources(tmp_path)
+    result_path = tmp_path / "outputs" / "vtc_fourier_llava15" / "run_results.json"
+    result_path.parent.mkdir(parents=True)
+    result_path.write_text(
+        json.dumps(
+            {
+                "config": {"model": "vtc_fourier_llava15", "limit": 1},
+                "results": {"mme": {"acc,none": 0.75, "acc_stderr,none": 0.01}},
+                "n-samples": {"mme": {"original": 10, "effective": 1}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = build_report(
+        repo_root=tmp_path,
+        profiles=[],
+        result_paths=[tmp_path / "outputs"],
+        run_id="unit",
+        preset="smoke",
+        tasks="mme",
+    )
+
+    assert "| `mme` | `acc` | 0.7500 | - | - |" in report
+    assert f"- {result_path}" in report
+
+
 def test_write_report_creates_parent_directory(tmp_path: Path):
     output_path = tmp_path / "docs" / "report.md"
 

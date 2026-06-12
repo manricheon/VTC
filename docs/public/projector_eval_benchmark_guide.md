@@ -127,9 +127,14 @@ Write a Markdown benchmark report:
 bash scripts/write_projector_eval_report.sh \
   --run-id smoke_2026_06_12 \
   --preset smoke \
+  --result artifacts/profiles/projector_eval_smoke_mme_fourier_mme \
+  --result artifacts/profiles/projector_eval_smoke_mme_divt_mme \
   --output-md docs/public/projector_eval_current_report.md \
   artifacts/profiles/projector_eval_smoke_*.jsonl
 ```
+
+Use `--result` for `lmms-eval` output directories or `*_results.json` files.
+The positional JSONL paths are runtime profile files.
 
 For full runs, use `--preset full` and pass the corresponding
 `projector_eval_full_*.jsonl` files:
@@ -139,6 +144,8 @@ bash scripts/write_projector_eval_report.sh \
   --run-id full_2026_06_12 \
   --preset full \
   --limit none \
+  --result artifacts/profiles/projector_eval_full_mme_fourier_mme \
+  --result artifacts/profiles/projector_eval_full_mme_divt_mme \
   --output-md docs/public/projector_eval_current_report.md \
   artifacts/profiles/projector_eval_full_*.jsonl
 ```
