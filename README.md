@@ -4,6 +4,9 @@ VTC is a Linux-target, uv-managed multi-project workspace for video token compre
 
 The first subproject is `projects/gaze-ov-bridge`, which restarts the AutoGaze, OneVision-Encoder, and LLaVA-OV2 work from a clean, staged foundation.
 
+`projects/projector-eval-harness` is a guarded LLaVA-1.5 projector comparison
+harness for Fourier-Compressor and DiVT.
+
 Start with the bridge-core environment guide: [docs/public/environment.md](docs/public/environment.md).
 For a fresh Linux/CUDA machine where `external/` and `weights/` are missing,
 follow [docs/public/cuda_machine_setup.md](docs/public/cuda_machine_setup.md).
@@ -11,6 +14,7 @@ follow [docs/public/cuda_machine_setup.md](docs/public/cuda_machine_setup.md).
 ## Repository Layout
 
 - `projects/gaze-ov-bridge/` - first bridge subproject.
+- `projects/projector-eval-harness/` - LLaVA-1.5 projector comparison harness.
 - `envs/` - uv-managed environment definitions and setup notes.
 - `external/` - third-party source repositories. Do not clone repositories here unless explicitly requested.
 - `weights/` - Hugging Face weights, checkpoints, and caches. Do not download model weights unless explicitly requested.
